@@ -1,8 +1,8 @@
 streamlit
-pymatgen
+pymatgen==2024.6.10
 mp-api>=0.34.3
 pandas
-numpy
+numpy==1.26.4
 py3Dmol
 ipython
 pubchempy
