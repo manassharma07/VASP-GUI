@@ -263,6 +263,13 @@ if uploaded_file is not None:
         visualize_molecule(structure, 'xyz_visualization.html')
     else:
         visualize_structure(structure, 'structure_visualization.html')
+    
+    # Download CIF files
+    if isinstance(structure, Structure):
+        st.subheader("Download CIF Files")
+
+        convert_to_cif(structure, "structure.cif")
+        st.download_button('Download CIF', data=read_file("structure.cif"), file_name='structure.cif', key='cif_button')
 
     # Provide download link for POSCAR
     convert_to_poscar(structure, 'POSCAR')
@@ -296,14 +303,6 @@ if uploaded_file is not None:
     LCHARG = .FALSE.  # Write CHGCAR file
     """
 
-    st.subheader("Download POSCAR")
-    st.download_button(
-        label="Download POSCAR",
-        data=poscar_content,
-        file_name='POSCAR',
-        mime='text/plain',
-    )
-
     st.subheader("POSCAR and KPOINTS")
 
     # Display POSCAR and KPOINTS in editable text boxes
@@ -312,13 +311,31 @@ if uploaded_file is not None:
     with col1:
         st.write("### POSCAR")
         poscar_editable = st.text_area("POSCAR Content", poscar_content, height=300)
+        st.download_button(
+            label="Download POSCAR",
+            data=poscar_editable,
+            file_name='POSCAR',
+            mime='text/plain',
+        )
 
     with col2:
         st.write("### KPOINTS")
         kpoints_editable = st.text_area("KPOINTS Content", kpoints_content, height=300)
+        st.download_button(
+            label="Download KPOINTS",
+            data=kpoints_editable,
+            file_name='KPOINTS',
+            mime='text/plain',
+        )
 
     # Display INCAR file
     st.subheader("Sample INCAR")
-    st.text_area("INCAR Content", incar_content, height=300)
+    incar_editable = st.text_area("INCAR Content", incar_content, height=300)
+    st.download_button(
+        label="Download INCAR",
+        data=incar_editable,
+        file_name='INCAR',
+        mime='text/plain',
+    )
 else:
     st.warning("Please upload a file.")
