@@ -7,6 +7,7 @@ from pymatgen.io.cif import CifParser
 from pymatgen.io.xyz import XYZ
 from pymatgen.io.vasp.inputs import Poscar
 from pymatgen.io.pwscf import PWInput
+from pymatgen.core import Structure, Lattice
 from ase import Atoms
 
 import py3Dmol
@@ -165,10 +166,32 @@ def parse_cif_pymatgen(contents):
     return structure
 
 
+# def parse_xyz(contents):
+#     # Parse the XYZ file using pymatgen
+#     xyz_parser = XYZ.from_str(contents)
+#     structure = xyz_parser.molecule  # Assuming it's a molecule XYZ file
+#     return structure
+
 def parse_xyz(contents):
     # Parse the XYZ file using pymatgen
     xyz_parser = XYZ.from_str(contents)
-    structure = xyz_parser.molecule  # Assuming it's a molecule XYZ file
+    molecule = xyz_parser.molecule  # Assuming it's a molecule XYZ file
+    
+    # Get the atomic positions and calculate the min and max coordinates
+    positions = molecule.cart_coords
+    min_pos = positions.min(axis=0)
+    max_pos = positions.max(axis=0)
+    
+    # Calculate the cell dimensions with a 15 Å buffer in all three directions
+    buffer = 15.0
+    cell_dimensions = (max_pos - min_pos) + 2 * buffer
+    
+    # Create a cubic lattice with the calculated dimensions
+    lattice = Lattice.cubic(cell_dimensions.max())  # Create a cubic lattice for simplicity
+    
+    # Convert the molecule to a periodic structure
+    structure = Structure(lattice, molecule.species, molecule.cart_coords)
+    
     return structure
 
 
@@ -269,38 +292,6 @@ if uploaded_file is not None:
         stringio = StringIO(contents)
         structure = parse_extxyz_ase(stringio)
 
-    # Apply cell with 15 Å buffer
-    if not isinstance(structure, Structure):  # type = Structure (periodic)
-        # positions = structure.get_positions()
-        # min_pos = positions.min(axis=0)
-        # max_pos = positions.max(axis=0)
-        # buffer = 15.0
-        # cell_dimensions = (max_pos - min_pos) + 2 * buffer
-        # structure.set_cell(cell_dimensions)
-        # structure.center()
-        # # Set periodic boundary conditions
-        # structure.set_pbc([True, True, True])
-        # Assuming 'structure' is a Molecule object
-        # Extract positions and chemical symbols from the Molecule object
-        positions = structure.positions
-        symbols = structure.get_chemical_symbols()
-
-        # Create an Atoms object
-        structure = Atoms(symbols=symbols, positions=positions)
-
-        # Now calculate the cell dimensions with a 15 Å buffer in all three directions
-        min_pos = positions.min(axis=0)
-        max_pos = positions.max(axis=0)
-
-        buffer = 15.0
-        cell_dimensions = (max_pos - min_pos) + 2 * buffer
-
-        # Set the cell and center the molecule within it
-        structure.set_cell([cell_dimensions[0], cell_dimensions[1], cell_dimensions[2]])
-        structure.center()
-
-        # Set periodic boundary conditions
-        structure.set_pbc([True, True, True])
     
     # Display structure information
     if isinstance(structure, Structure):  # type = Structure
