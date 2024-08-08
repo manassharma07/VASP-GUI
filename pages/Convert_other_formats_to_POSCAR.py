@@ -42,10 +42,20 @@ def convert_to_cif(structure, filename):
     cif_writer.write_file(filename)
 
 
-# Function to convert a structure to POSCAR
-def convert_to_poscar(structure, filename):
+# Function to convert a structure to POSCAR format and save to file
+def convert_to_poscar(structure, filename, coord_type='Direct'):
     poscar = Poscar(structure)
     poscar.write_file(filename)
+    with open(filename, 'r') as file:
+        poscar_content = file.read()
+    
+    if coord_type == 'Direct':
+        poscar_content = poscar_content.replace('Cartesian', 'Direct')
+    else:
+        poscar_content = poscar_content.replace('Direct', 'Cartesian')
+    
+    with open(filename, 'w') as file:
+        file.write(poscar_content)
 
 
 # Function to visualize the structure using py3Dmol
@@ -274,8 +284,10 @@ if uploaded_file is not None:
         convert_to_cif(structure, "structure.cif")
         st.download_button('Download CIF', data=read_file("structure.cif"), file_name='structure.cif', key='cif_button')
 
+    # Add a selection box for coordinate type
+    coord_type = st.selectbox("Select coordinate type for POSCAR", ["Direct", "Cartesian"])
     # Provide download link for POSCAR
-    convert_to_poscar(structure, 'POSCAR')
+    convert_to_poscar(structure, 'POSCAR', coord_type)
     poscar_content = read_file('POSCAR')
 
     # Generate a sample KPOINTS file
