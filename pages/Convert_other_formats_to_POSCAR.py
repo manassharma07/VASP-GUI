@@ -254,8 +254,11 @@ if uploaded_file is not None:
         stringio = StringIO(contents)
         structure = parse_extxyz_ase(stringio)
     
-    # Display the structure information
-    display_structure_info(structure)
+    # Display structure information
+    if isinstance(structure, Structure):  # type = Structure
+        display_structure_info(structure)
+    else:  # type = Molecule
+        st.subheader("Atomic Coordinates")
 
     # Visualize the structure
     st.subheader("Structure Visualization")
