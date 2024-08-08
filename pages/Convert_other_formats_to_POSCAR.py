@@ -215,7 +215,7 @@ def read_file(filename):
 
 
 # Streamlit app
-st.write('# CIF/XYZ/CAR/POSCAR/PWSCF ➡️ VASP POSCAR')
+st.write('# CIF/XYZ/CAR/PWSCF ➡️ VASP POSCAR')
 st.write(
     "#### Convert various file formats to VASP POSCAR format.") 
 
@@ -268,6 +268,34 @@ if uploaded_file is not None:
     convert_to_poscar(structure, 'POSCAR')
     poscar_content = read_file('POSCAR')
 
+    # Generate a sample KPOINTS file
+    kpoints_content = """KPOINTS
+    0
+    Monkhorst-Pack
+    6 6 6
+    0 0 0
+    """
+
+    # Generate a sample INCAR file
+    incar_content = """INCAR
+    # General settings
+    ENCUT = 520       # Energy cutoff for plane waves
+    PREC = Accurate   # Precision mode
+    EDIFF = 1E-6      # Energy convergence criterion
+    ISMEAR = 0        # Gaussian smearing
+    SIGMA = 0.05      # Smearing width
+    # Electronic relaxation
+    ALGO = Fast       # Algorithm (Fast or Normal)
+    NELM = 100        # Maximum number of electronic steps
+    # Ionic relaxation
+    IBRION = 2        # Algorithm for ionic relaxation (2 = conjugate gradient)
+    NSW = 50          # Maximum number of ionic steps
+    ISIF = 3          # Stress and relaxation (3 = relax cell shape and volume)
+    # Output settings
+    LWAVE = .FALSE.   # Write WAVECAR file
+    LCHARG = .FALSE.  # Write CHGCAR file
+    """
+
     st.subheader("Download POSCAR")
     st.download_button(
         label="Download POSCAR",
@@ -275,5 +303,22 @@ if uploaded_file is not None:
         file_name='POSCAR',
         mime='text/plain',
     )
+
+    st.subheader("POSCAR and KPOINTS")
+
+    # Display POSCAR and KPOINTS in editable text boxes
+    col1, col2 = st.columns(2)
+
+    with col1:
+        st.write("### POSCAR")
+        poscar_editable = st.text_area("POSCAR Content", poscar_content, height=300)
+
+    with col2:
+        st.write("### KPOINTS")
+        kpoints_editable = st.text_area("KPOINTS Content", kpoints_content, height=300)
+
+    # Display INCAR file
+    st.subheader("Sample INCAR")
+    st.text_area("INCAR Content", incar_content, height=300)
 else:
     st.warning("Please upload a file.")
