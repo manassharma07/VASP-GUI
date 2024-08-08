@@ -295,7 +295,7 @@ if uploaded_file is not None:
         direct = False
     # Provide download link for POSCAR
     # convert_to_poscar_pymatgen(structure, 'POSCAR')
-    convert_to_poscar_pymatgen(structure, 'POSCAR', direct)
+    convert_to_poscar_ase(structure, 'POSCAR', direct)
     poscar_content = read_file('POSCAR')
 
     # Generate a sample KPOINTS file
