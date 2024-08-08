@@ -266,6 +266,16 @@ if uploaded_file is not None:
     elif file_format == 'Extended XYZ':
         stringio = StringIO(contents)
         structure = parse_extxyz_ase(stringio)
+
+    # Apply cell with 15 Å buffer
+    if not isinstance(structure, Structure):  # type = Structure (periodic)
+        positions = structure.get_positions()
+        min_pos = positions.min(axis=0)
+        max_pos = positions.max(axis=0)
+        buffer = 15.0
+        cell_dimensions = (max_pos - min_pos) + 2 * buffer
+        structure.set_cell(cell_dimensions)
+        structure.center()
     
     # Display structure information
     if isinstance(structure, Structure):  # type = Structure
