@@ -55,9 +55,8 @@ def convert_to_poscar_pymatgen(structure, filename):
 # Function to convert a structure to POSCAR format and save to file
 def convert_to_poscar_ase(structure, filename, direct=False):
     ase_atoms = structure.to_ase_atoms()
-    write_vasp(ase_atoms, direct=direct)
-    with open(filename, 'r') as file:
-        poscar_content = file.read()
+    with open(filename, 'w') as f:
+        write_vasp(f, ase_atoms, direct=direct)
     
     
 
@@ -290,8 +289,13 @@ if uploaded_file is not None:
 
     # Add a selection box for coordinate type
     coord_type = st.selectbox("Select coordinate type for POSCAR", ["Direct", "Cartesian"])
+    if coord_type=='Direct':
+        direct = True
+    else:
+        direct = False
     # Provide download link for POSCAR
-    convert_to_poscar_pymatgen(structure, 'POSCAR')
+    # convert_to_poscar_pymatgen(structure, 'POSCAR')
+    convert_to_poscar_pymatgen(structure, 'POSCAR', direct)
     poscar_content = read_file('POSCAR')
 
     # Generate a sample KPOINTS file
@@ -322,7 +326,7 @@ if uploaded_file is not None:
     LCHARG = .FALSE.  # Write CHGCAR file
     """
 
-    st.subheader("POSCAR and KPOINTS")
+    st.subheader("INPUT Files")
 
     # Display POSCAR and KPOINTS in editable text boxes
     col1, col2 = st.columns(2)
