@@ -173,32 +173,27 @@ def parse_cif_pymatgen(contents):
 #     return structure
 
 def parse_xyz(contents):
-    # Parse the XYZ file using pymatgen
+    # Step 1: Parse the XYZ file using pymatgen
     xyz_parser = XYZ.from_str(contents)
     molecule = xyz_parser.molecule  # Assuming it's a molecule XYZ file
     
-    # Get the atomic positions and calculate the min and max coordinates
-    positions = molecule.cart_coords
-    min_pos = positions.min(axis=0)
-    max_pos = positions.max(axis=0)
+    # Step 2: Convert pymatgen Molecule to ASE Atoms object
+    ase_atoms = AseAtomsAdaptor.get_atoms(molecule)
     
-    # Calculate the cell dimensions with a 15 Å buffer in all three directions
+    # Step 3: Calculate the new cell dimensions with a 15 Å buffer in each direction
+    positions = ase_atoms.get_positions()
+    min_pos = np.min(positions, axis=0)
+    max_pos = np.max(positions, axis=0)
     buffer = 15.0
     cell_dimensions = (max_pos - min_pos) + 2 * buffer
     
-    # Create a lattice with the calculated dimensions
-    lattice = Lattice.from_lengths_and_angles(
-        a=cell_dimensions[0], 
-        b=cell_dimensions[1], 
-        c=cell_dimensions[2], 
-        alpha=90, beta=90, gamma=90
-    )
+    # Create a cubic cell with the calculated dimensions
+    ase_atoms.set_cell(cell_dimensions)
+    ase_atoms.center()  # Center the molecule in the cell
+    ase_atoms.set_pbc(True)  # Set periodic boundary conditions
     
-    # Shift positions so that they are inside the cell
-    shifted_positions = positions - min_pos + buffer
-    
-    # Convert the molecule to a periodic structure with shifted positions
-    structure = Structure(lattice, molecule.species, shifted_positions)
+    # Step 4: Convert the ASE Atoms object back to pymatgen Structure
+    structure = AseAtomsAdaptor.get_structure(ase_atoms)
     
     return structure
 
