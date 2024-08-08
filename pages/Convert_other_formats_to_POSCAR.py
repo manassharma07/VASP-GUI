@@ -186,11 +186,19 @@ def parse_xyz(contents):
     buffer = 15.0
     cell_dimensions = (max_pos - min_pos) + 2 * buffer
     
-    # Create a cubic lattice with the calculated dimensions
-    lattice = Lattice.cubic(cell_dimensions.max())  # Create a cubic lattice for simplicity
+    # Create a lattice with the calculated dimensions
+    lattice = Lattice.from_lengths_and_angles(
+        a=cell_dimensions[0], 
+        b=cell_dimensions[1], 
+        c=cell_dimensions[2], 
+        alpha=90, beta=90, gamma=90
+    )
     
-    # Convert the molecule to a periodic structure
-    structure = Structure(lattice, molecule.species, molecule.cart_coords)
+    # Shift positions so that they are inside the cell
+    shifted_positions = positions - min_pos + buffer
+    
+    # Convert the molecule to a periodic structure with shifted positions
+    structure = Structure(lattice, molecule.species, shifted_positions)
     
     return structure
 
