@@ -182,8 +182,8 @@ def parse_xyz(contents):
     
     # Step 3: Calculate the new cell dimensions with a 15 Å buffer in each direction
     positions = ase_atoms.get_positions()
-    min_pos = np.min(positions, axis=0)
-    max_pos = np.max(positions, axis=0)
+    min_pos = min(positions, axis=0)
+    max_pos = max(positions, axis=0)
     buffer = 15.0
     cell_dimensions = (max_pos - min_pos) + 2 * buffer
     
