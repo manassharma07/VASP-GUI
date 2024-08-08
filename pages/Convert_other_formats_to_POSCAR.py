@@ -15,6 +15,7 @@ from ase.io.espresso import read_espresso_in
 from ase.io.extxyz import read_extxyz
 from ase.io.cif import read_cif
 from ase.io import read
+from ase.io.vasp import write_vasp
 from pymatgen.io.ase import AseAtomsAdaptor
 from ase.io.dmol import read_dmol_car
 
@@ -43,15 +44,22 @@ def convert_to_cif(structure, filename):
 
 
 # Function to convert a structure to POSCAR format and save to file
-def convert_to_poscar(structure, filename, coord_type='Direct'):
+def convert_to_poscar_pymatgen(structure, filename):
     poscar = Poscar(structure)
     poscar.write_file(filename)
     with open(filename, 'r') as file:
         poscar_content = file.read()
     
+
+
+# Function to convert a structure to POSCAR format and save to file
+def convert_to_poscar_ase(structure, filename, direct=False):
+    ase_atoms = structure.to_ase_atoms()
+    write_vasp(ase_atoms, direct=direct)
+    with open(filename, 'r') as file:
+        poscar_content = file.read()
     
-    with open(filename, 'w') as file:
-        file.write(poscar_content, direct=False)
+    
 
 
 # Function to visualize the structure using py3Dmol
@@ -283,7 +291,7 @@ if uploaded_file is not None:
     # Add a selection box for coordinate type
     coord_type = st.selectbox("Select coordinate type for POSCAR", ["Direct", "Cartesian"])
     # Provide download link for POSCAR
-    convert_to_poscar(structure, 'POSCAR', coord_type)
+    convert_to_poscar_pymatgen(structure, 'POSCAR')
     poscar_content = read_file('POSCAR')
 
     # Generate a sample KPOINTS file
