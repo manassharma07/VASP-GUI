@@ -9,6 +9,7 @@ from pymatgen.io.vasp.inputs import Poscar
 from pymatgen.io.pwscf import PWInput
 from pymatgen.core import Structure, Lattice
 from ase import Atoms
+import numpy as np
 
 import py3Dmol
 import pandas as pd
@@ -182,8 +183,8 @@ def parse_xyz(contents):
     
     # Step 3: Calculate the new cell dimensions with a 15 Å buffer in each direction
     positions = ase_atoms.get_positions()
-    min_pos = min(positions, axis=0)
-    max_pos = max(positions, axis=0)
+    min_pos = np.min(positions, axis=0)
+    max_pos = np.max(positions, axis=0)
     buffer = 15.0
     cell_dimensions = (max_pos - min_pos) + 2 * buffer
     
