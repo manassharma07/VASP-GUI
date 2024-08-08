@@ -299,15 +299,15 @@ if uploaded_file is not None:
     poscar_content = read_file('POSCAR')
 
     # Generate a sample KPOINTS file
-    kpoints_content = """KPOINTS
-    0
-    Monkhorst-Pack
-    6 6 6
-    0 0 0
+    kpoints_content = """Automatic generation
+0
+Monkhorst-pack
+ 4 4 4
+ 0 0 0
     """
 
     # Generate a sample INCAR file
-    incar_content = """INCAR
+    incar_content = """
     # General settings
     ENCUT = 520       # Energy cutoff for plane waves
     PREC = Accurate   # Precision mode
