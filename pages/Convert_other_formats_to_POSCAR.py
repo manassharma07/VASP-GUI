@@ -49,13 +49,9 @@ def convert_to_poscar(structure, filename, coord_type='Direct'):
     with open(filename, 'r') as file:
         poscar_content = file.read()
     
-    if coord_type == 'Direct':
-        poscar_content = poscar_content.replace('Cartesian', 'Direct')
-    else:
-        poscar_content = poscar_content.replace('Direct', 'Cartesian')
     
     with open(filename, 'w') as file:
-        file.write(poscar_content)
+        file.write(poscar_content, direct=False)
 
 
 # Function to visualize the structure using py3Dmol
