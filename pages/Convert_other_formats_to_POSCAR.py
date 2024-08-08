@@ -301,10 +301,14 @@ if uploaded_file is not None:
 
     # Visualize the structure
     st.subheader("Structure Visualization")
-    if file_format == 'XYZ':
-        visualize_molecule(structure, 'xyz_visualization.html')
-    else:
+    # if file_format == 'XYZ':
+    #     visualize_molecule(structure, 'xyz_visualization.html')
+    # else:
+    #     visualize_structure(structure, 'structure_visualization.html')
+    if isinstance(structure, Structure):  # type = Structure
         visualize_structure(structure, 'structure_visualization.html')
+    else:
+        visualize_molecule(structure, 'xyz_visualization.html')
     
     # Download CIF files
     if isinstance(structure, Structure):
