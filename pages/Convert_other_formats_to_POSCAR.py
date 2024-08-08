@@ -276,6 +276,8 @@ if uploaded_file is not None:
         cell_dimensions = (max_pos - min_pos) + 2 * buffer
         structure.set_cell(cell_dimensions)
         structure.center()
+        # Set periodic boundary conditions
+        structure.set_pbc([True, True, True])
     
     # Display structure information
     if isinstance(structure, Structure):  # type = Structure
