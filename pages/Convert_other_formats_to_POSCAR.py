@@ -7,6 +7,8 @@ from pymatgen.io.cif import CifParser
 from pymatgen.io.xyz import XYZ
 from pymatgen.io.vasp.inputs import Poscar
 from pymatgen.io.pwscf import PWInput
+from ase import Atoms
+
 import py3Dmol
 import pandas as pd
 import streamlit.components.v1 as components
@@ -269,13 +271,34 @@ if uploaded_file is not None:
 
     # Apply cell with 15 Å buffer
     if not isinstance(structure, Structure):  # type = Structure (periodic)
-        positions = structure.get_positions()
+        # positions = structure.get_positions()
+        # min_pos = positions.min(axis=0)
+        # max_pos = positions.max(axis=0)
+        # buffer = 15.0
+        # cell_dimensions = (max_pos - min_pos) + 2 * buffer
+        # structure.set_cell(cell_dimensions)
+        # structure.center()
+        # # Set periodic boundary conditions
+        # structure.set_pbc([True, True, True])
+        # Assuming 'structure' is a Molecule object
+        # Extract positions and chemical symbols from the Molecule object
+        positions = structure.positions
+        symbols = structure.get_chemical_symbols()
+
+        # Create an Atoms object
+        structure = Atoms(symbols=symbols, positions=positions)
+
+        # Now calculate the cell dimensions with a 15 Å buffer in all three directions
         min_pos = positions.min(axis=0)
         max_pos = positions.max(axis=0)
+
         buffer = 15.0
         cell_dimensions = (max_pos - min_pos) + 2 * buffer
-        structure.set_cell(cell_dimensions)
+
+        # Set the cell and center the molecule within it
+        structure.set_cell([cell_dimensions[0], cell_dimensions[1], cell_dimensions[2]])
         structure.center()
+
         # Set periodic boundary conditions
         structure.set_pbc([True, True, True])
     
