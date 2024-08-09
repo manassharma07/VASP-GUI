@@ -115,7 +115,7 @@ incar_settings['ISMEAR'] = st.selectbox("Smearing Type (ISMEAR)", [-5, -1, 0, 1,
 
 incar_settings['SIGMA'] = st.slider("Smearing Width (SIGMA)", min_value=0.01, max_value=0.5, value=incar_defaults['SIGMA'], step=0.01)
 
-incar_settings['EDIFFG'] = st.number_input("Ionic Relaxation Criterion (EDIFFG)", min_value=-1e-3, max_value=-1e-7, value=incar_defaults['EDIFFG'], format="%.1e")
+incar_settings['EDIFFG'] = st.number_input("Ionic Relaxation Criterion (EDIFFG)", min_value=-1e-7, max_value=-1e-3, value=incar_defaults['EDIFFG'], format="%.1e")
 
 incar_settings['NSW'] = st.number_input("Number of Ionic Steps (NSW)", min_value=0, max_value=200, value=incar_defaults['NSW'])
 
