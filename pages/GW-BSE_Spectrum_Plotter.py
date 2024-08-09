@@ -88,8 +88,8 @@ if content:
     output = io.BytesIO()
 
     # Use context manager to ensure proper handling
-    with pd.ExcelWriter(output, engine='xlsxwriter') as writer:
-        df.to_excel(writer, index=False, sheet_name='Sheet1')
+    with pd.ExcelWriter("spectrum_data.xlsx", engine='xlsxwriter') as writer:
+        df.to_excel(writer, index=True, sheet_name='Sheet1')
 
     # Seek to the beginning of the stream to read it
     output.seek(0)
