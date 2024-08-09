@@ -35,6 +35,8 @@ def parse_vasprun(content):
 
         if inside_dielectricfunction and line.strip().startswith("<r>"):
             parts = re.split(r'\s+', line.strip())
+            
+            # Ensure there are at least 5 parts to avoid errors
             if len(parts) >= 5:
                 energy.append(float(parts[1]))
                 imaginary.append(float(parts[2]))
