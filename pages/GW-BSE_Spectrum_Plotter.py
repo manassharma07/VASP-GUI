@@ -93,8 +93,16 @@ if content:
 
     # # Seek to the beginning of the stream to read it
     # output.seek(0)
-    with pd.ExcelWriter("spectrum_data.xlsx") as writer:
-        df.to_excel(writer)
+    # with pd.ExcelWriter("spectrum_data.xlsx") as writer:
+    #     df.to_excel(writer)
+    # Create a Pandas Excel writer using XlsxWriter as the engine.
+    writer = pd.ExcelWriter('pandas_simple.xlsx', engine='xlsxwriter')
+
+    # Convert the dataframe to an XlsxWriter Excel object.
+    df.to_excel(writer, sheet_name='Sheet1')
+
+    # Close the Pandas Excel writer and output the Excel file.
+    writer.close()
 
     # Provide the download option in Streamlit
     st.download_button(label="Download Excel file", data=output, file_name="spectrum_data.xlsx")
