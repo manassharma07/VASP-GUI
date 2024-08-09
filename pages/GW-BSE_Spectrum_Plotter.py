@@ -78,12 +78,24 @@ if content:
     df = parse_vasprun(content)
     st.dataframe(df)
 
+    # output = io.BytesIO()
+    # writer = pd.ExcelWriter(output, engine='xlsxwriter')
+    # df.to_excel(writer, sheet_name='Sheet1', index=False)
+    # writer.save()
+    # output.seek(0)
+    # st.download_button('Download data as Excel file', data=output, file_name='gw_bse_spectrum.xlsx')
+    # Create a BytesIO buffer to write the Excel file to
     output = io.BytesIO()
-    writer = pd.ExcelWriter(output, engine='xlsxwriter')
-    df.to_excel(writer, sheet_name='Sheet1', index=False)
-    writer.save()
+
+    # Use context manager to ensure proper handling
+    with pd.ExcelWriter(output, engine='xlsxwriter') as writer:
+        df.to_excel(writer, index=False, sheet_name='Sheet1')
+
+    # Seek to the beginning of the stream to read it
     output.seek(0)
-    st.download_button('Download data as Excel file', data=output, file_name='gw_bse_spectrum.xlsx')
+
+    # Provide the download option in Streamlit
+    st.download_button(label="Download Excel file", data=output, file_name="spectrum_data.xlsx")
 
 
     ## Plot the dielectric function
