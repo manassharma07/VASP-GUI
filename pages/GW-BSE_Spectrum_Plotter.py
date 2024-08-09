@@ -96,7 +96,7 @@ if content:
     # with pd.ExcelWriter("spectrum_data.xlsx") as writer:
     #     df.to_excel(writer)
     # Create a Pandas Excel writer using XlsxWriter as the engine.
-    writer = pd.ExcelWriter('pandas_simple.xlsx', engine='xlsxwriter')
+    writer = pd.ExcelWriter('spectrum_data.xlsx', engine='xlsxwriter')
 
     # Convert the dataframe to an XlsxWriter Excel object.
     df.to_excel(writer, sheet_name='Sheet1')
