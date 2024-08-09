@@ -87,12 +87,14 @@ if content:
     # Create a BytesIO buffer to write the Excel file to
     output = io.BytesIO()
 
-    # Use context manager to ensure proper handling
-    with pd.ExcelWriter("spectrum_data.xlsx", engine='xlsxwriter') as writer:
-        df.to_excel(writer, index=True, sheet_name='Sheet1')
+    # # Use context manager to ensure proper handling
+    # with pd.ExcelWriter("spectrum_data.xlsx", engine='xlsxwriter') as writer:
+    #     df.to_excel(writer, index=True, sheet_name='Sheet1')
 
-    # Seek to the beginning of the stream to read it
-    output.seek(0)
+    # # Seek to the beginning of the stream to read it
+    # output.seek(0)
+    with pd.ExcelWriter("spectrum_data.xlsx") as writer:
+        df.to_excel(writer)
 
     # Provide the download option in Streamlit
     st.download_button(label="Download Excel file", data=output, file_name="spectrum_data.xlsx")
