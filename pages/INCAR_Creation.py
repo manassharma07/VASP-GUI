@@ -24,6 +24,10 @@ incar_defaults = {
 
 # Helper function to generate the INCAR text
 def generate_incar(incar_settings):
+    # Calculate the padding required for alignment
+    max_key_length = max(len(key) for key in incar_settings.keys())
+    max_value_length = max(len(str(value)) for value in incar_settings.values())
+
     incar_lines = []
     for key, value in incar_settings.items():
         comment = f" ! {key} description"
@@ -63,9 +67,14 @@ def generate_incar(incar_settings):
             comment = " ! Charge initialization (2 = atom, 1 = from file)"
         elif key == 'IVDW':
             comment = " ! Van der Waals interaction correction"
-
-        incar_lines.append(f"{key} = {value} {comment}")
+        
+        # Align comments by adding spaces between value and comment
+        key_value_str = f"{key} = {value}"
+        padding = " " * (max_key_length + max_value_length - len(key_value_str) + 4)  # Adjust padding to align comments
+        incar_lines.append(f"{key_value_str}{padding}{comment}")
+    
     return "\n".join(incar_lines)
+
 
 # Helper function to generate the KPOINTS file text
 def generate_kpoints(kmesh_type, kpoints, shift):
