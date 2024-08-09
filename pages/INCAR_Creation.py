@@ -185,3 +185,33 @@ st.markdown("""
 - **LWAVE**: Write WAVECAR file (default is .TRUE.)
 - **LCHARG**: Write CHGCAR file (default is .TRUE.)
 """)
+
+import streamlit as st
+
+# Create a markdown table for INCAR options
+incar_options_table = """
+| **Option**   | **Possible Values**                                          | **Explanation**                                                                                           |
+|--------------|--------------------------------------------------------------|-----------------------------------------------------------------------------------------------------------|
+| `SYSTEM`     | *Any string*                                                 | A descriptive name for the calculation. Often used to identify the system being simulated.                 |
+| `ISTART`     | `0`, `1`, `2`                                                | Determines how the calculation is started: <br> - `0`: New calculation <br> - `1`: Continue from WAVECAR <br> - `2`: Restart from previous CHGCAR and WAVECAR |
+| `ICHARG`     | `0`, `1`, `2`, `10`, `11`                                    | Determines how the charge density is initialized: <br> - `0`: Charge from initial guess <br> - `1`: Read charge from CHGCAR file <br> - `2`: Non-self-consistent calculation from atomic charge densities <br> - `10`: Constant charge density <br> - `11`: Non-self-consistent calculation with constant charge |
+| `ENCUT`      | *Any positive float*                                         | Energy cutoff for the plane-wave basis set. Controls the precision of the calculation; higher values give more accuracy but increase computational cost. |
+| `PREC`       | `Low`, `Medium`, `High`, `Accurate`                          | Precision mode: <br> - `Low`: Fast but less accurate <br> - `Medium`: Standard precision <br> - `High`: Higher precision <br> - `Accurate`: Very high precision, used for sensitive systems |
+| `EDIFF`      | *Any positive float*                                         | Convergence criterion for the electronic self-consistency loop. Smaller values lead to more accurate solutions but may require more iterations. |
+| `IBRION`     | `0`, `1`, `2`, `3`, `5`, `6`, `7`, `8`, `44`                 | Controls ionic relaxation algorithm: <br> - `0`: No ionic updates <br> - `1`: RMM-DIIS relaxation <br> - `2`: Conjugate gradient relaxation <br> - `3`: Damped molecular dynamics <br> - `5`: Vibrational analysis <br> - `6`: Damped molecular dynamics (ISIF=3) <br> - `7`: Conjugate gradient relaxation (x-damped) <br> - `8`: Vibrational analysis with finite differences <br> - `44`: Quasi-Newton method |
+| `NSW`        | *Any positive integer*                                       | Number of ionic steps for relaxation. Determines how many ionic moves are attempted. |
+| `ISMEAR`     | `-5`, `-1`, `0`, `1`, `2`                                    | Smearing type for partial occupancies: <br> - `-5`: Tetrahedron method (useful for insulators) <br> - `-1`: Fermi smearing <br> - `0`: Gaussian smearing <br> - `1`, `2`: Methfessel-Paxton smearing (useful for metals) |
+| `SIGMA`      | *Any positive float*                                         | Width of the smearing (in eV) applied to partial occupancies. Smaller values are typically used for insulators, while larger values can be used for metals. |
+| `MAGMOM`     | `N*x.y`, `Nx*x.y`                                            | Initial magnetic moment per atom. Can be set as a list of moments, or a shorthand notation like `N*x.y` where `N` is the number of atoms and `x.y` is the magnetic moment per atom. |
+| `ISPIN`      | `1`, `2`                                                     | Controls spin polarization: <br> - `1`: Non-spin-polarized calculation <br> - `2`: Spin-polarized calculation |
+| `LORBIT`     | `0`, `1`, `2`, `10`, `11`, `12`                              | Determines the type of output for DOS and projected DOS: <br> - `0`: No output <br> - `1`: l-decomposed DOS <br> - `2`: Full (m-resolved) DOS <br> - `10`: l-decomposed DOS with no onsite correction <br> - `11`: l-decomposed DOS with onsite correction <br> - `12`: Full (m-resolved) DOS with onsite correction |
+| `ALGO`       | `Normal`, `Fast`, `Very Fast`, `Damped`, `All`               | Algorithm for electronic minimization: <br> - `Normal`: Default, general purpose <br> - `Fast`: Faster convergence for some systems <br> - `Very Fast`: Experimental, even faster convergence <br> - `Damped`: Damped electronic dynamics <br> - `All`: Combination of different algorithms |
+| `NELM`       | *Any positive integer*                                       | Maximum number of electronic self-consistency steps. If the calculation does not converge within this number of steps, it stops. |
+| `EDIFFG`     | *Any negative float*                                         | Convergence criterion for the ionic relaxation loop. The relaxation stops when all forces are smaller than this value. |
+| `POTIM`      | *Any positive float*                                         | Time step for ionic motion (in fs). Controls the step size for ionic updates during molecular dynamics or relaxation. |
+| `IVDW`       | `0`, `11`, `21`, `202`, `4`, `12`, `20`, `30`, `21`, `41`    | Enables van der Waals corrections: <br> - `0`: No van der Waals correction <br> - `11`: DFT-D2 correction <br> - `21`: DFT-D3 correction (Becke-Johnson damping) <br> - `202`: Many-body dispersion correction <br> - Others: Different variants of van der Waals corrections |
+"""
+
+# Add this table to your Streamlit app
+st.markdown("## INCAR Option Explanations")
+st.markdown(incar_options_table, unsafe_allow_html=True)
