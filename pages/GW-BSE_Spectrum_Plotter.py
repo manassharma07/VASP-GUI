@@ -5,6 +5,7 @@ import numpy as np
 import io
 import matplotlib.pyplot as plt
 import xml.etree.ElementTree as ET
+import re
 
 # Set page config
 st.set_page_config(page_title='GW/BSE Spectrum Plotter 📈', layout='wide', page_icon="⚛️",
