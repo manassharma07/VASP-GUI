@@ -15,11 +15,14 @@ menu_items={
 
 # Sidebar stuff
 st.sidebar.write('# About')
-st.sidebar.write('Originally Made By [Your Name](https://your.website)')
+st.sidebar.write('Made By [Manas Sharma](https://manas.bragitoff.com)')
 st.sidebar.write('### *Powered by*')
+st.sidebar.write('* [Py3Dmol](https://3dmol.csb.pitt.edu/) for Chemical System Visualizations')
 st.sidebar.write('* [Streamlit](https://streamlit.io/) for making of the Web App')
+st.sidebar.write('* [PyMatgen](https://pymatgen.org/) for Periodic Structure Representations')
+st.sidebar.write('* [ASE](https://wiki.fysik.dtu.dk/ase/) for File Format Conversions')
 st.sidebar.write('### *Source Code*')
-st.sidebar.write('[GitHub Repository](https://github.com/your-repo-link)')
+st.sidebar.write('[GitHub Repository](https://github.com/manassharma07/VASP-GUI)')
 
 def parse_vasprun(content):
     energy, imaginary, real = [], [], []

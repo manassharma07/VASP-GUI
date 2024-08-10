@@ -1,6 +1,23 @@
 import streamlit as st
 import base64
 
+# Set page config
+st.set_page_config(page_title='INCAR Creator', layout='wide', page_icon="⚛️",
+                   menu_items={
+                       'About': "A web app to help you create INCAR and KPOINT files."
+                   })
+
+# Sidebar stuff
+st.sidebar.write('# About')
+st.sidebar.write('Made By [Manas Sharma](https://manas.bragitoff.com)')
+st.sidebar.write('### *Powered by*')
+st.sidebar.write('* [Py3Dmol](https://3dmol.csb.pitt.edu/) for Chemical System Visualizations')
+st.sidebar.write('* [Streamlit](https://streamlit.io/) for making of the Web App')
+st.sidebar.write('* [PyMatgen](https://pymatgen.org/) for Periodic Structure Representations')
+st.sidebar.write('* [ASE](https://wiki.fysik.dtu.dk/ase/) for File Format Conversions')
+st.sidebar.write('### *Source Code*')
+st.sidebar.write('[GitHub Repository](https://github.com/manassharma07/VASP-GUI)')
+
 # Initialize default INCAR settings
 incar_defaults = {
     'SYSTEM': 'Calculation Name',  # Description of the system

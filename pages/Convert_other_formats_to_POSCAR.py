@@ -38,7 +38,7 @@ st.sidebar.write('* [Streamlit](https://streamlit.io/) for making of the Web App
 st.sidebar.write('* [PyMatgen](https://pymatgen.org/) for Periodic Structure Representations')
 st.sidebar.write('* [ASE](https://wiki.fysik.dtu.dk/ase/) for File Format Conversions')
 st.sidebar.write('### *Source Code*')
-st.sidebar.write('[GitHub Repository](https://github.com/manassharma07/Structure-Converter)')
+st.sidebar.write('[GitHub Repository](https://github.com/manassharma07/VASP-GUI)')
 
 
 # Function to convert a structure to CIF
