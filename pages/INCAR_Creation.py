@@ -39,8 +39,8 @@ incar_defaults = {
     'NSW': 20,                                # Number of steps for ionic relaxation
     'IBRION': 2,                              # Ionic relaxation method (2 = conjugate gradient)
     'POTIM': 0.5,                             # Step size for ionic motion
-    'ISPIN': 2,                               # Spin polarization (1 = no, 2 = yes)
-    'MAGMOM': '2*5.0',                        # Initial magnetic moment per atom
+    'ISPIN': 1,                               # Spin polarization (1 = no, 2 = yes)
+    'MAGMOM': 0,                        # Initial magnetic moment per atom
     'LORBIT': 11,                             # DOS and projections output
     'IVDW': 0                                 # van der Waals interaction correction
 }
@@ -101,16 +101,12 @@ def generate_incar(incar_settings):
 
 # Helper function to generate the KPOINTS file text
 def generate_kpoints(kmesh_type, kpoints, shift):
-    if kmesh_type == 'Automatic':
-        kpoints_text = "Automatic mesh\n0\nGamma\n"
-        kpoints_text += f"{kpoints[0]} {kpoints[1]} {kpoints[2]}\n"
-        kpoints_text += f"{shift[0]} {shift[1]} {shift[2]}"
-    elif kmesh_type == 'Gamma':
+    if kmesh_type == 'Gamma':
         kpoints_text = "Gamma mesh\n0\nGamma\n"
         kpoints_text += f"{kpoints[0]} {kpoints[1]} {kpoints[2]}\n"
         kpoints_text += f"{shift[0]} {shift[1]} {shift[2]}"
     elif kmesh_type == 'Monkhorst-Pack':
-        kpoints_text = "Monkhorst-Pack mesh\n0\nMonkhorst\n"
+        kpoints_text = "Monkhorst-Pack mesh\n0\nMonkhorst-Pack\n"
         kpoints_text += f"{kpoints[0]} {kpoints[1]} {kpoints[2]}\n"
         kpoints_text += f"{shift[0]} {shift[1]} {shift[2]}"
     else:
@@ -118,10 +114,10 @@ def generate_kpoints(kmesh_type, kpoints, shift):
     return kpoints_text
 
 # Function to download files
-def download_file(file_name, file_content):
+def download_file(file_name, file_content, col):
     b64 = base64.b64encode(file_content.encode()).decode()
     href = f'<a href="data:file/txt;base64,{b64}" download="{file_name}">Download {file_name}</a>'
-    st.markdown(href, unsafe_allow_html=True)
+    col.markdown(href, unsafe_allow_html=True)
 
 # Streamlit app layout
 st.title("INCAR and KPOINTS File Generator")
@@ -129,57 +125,64 @@ st.title("INCAR and KPOINTS File Generator")
 # User inputs for INCAR settings
 incar_settings = incar_defaults.copy()
 
-incar_settings['SYSTEM'] = st.text_input("System Name (SYSTEM)", incar_defaults['SYSTEM'])
+col1, col2 = st.columns(2)
 
-incar_settings['ISTART'] = st.selectbox("Job Start Type (ISTART)", [0, 1], index=[0, 1].index(incar_defaults['ISTART']))
+incar_settings['SYSTEM'] = col1.text_input("System Name (SYSTEM)", incar_defaults['SYSTEM'])
 
-incar_settings['ICHARG'] = st.selectbox("Charge Initialization (ICHARG)", [1, 2, 10], index=[1, 2, 10].index(incar_defaults['ICHARG']))
+incar_settings['ISTART'] = col1.selectbox("Job Start Type (ISTART)", [0, 1], index=[0, 1].index(incar_defaults['ISTART']))
 
-incar_settings['ENCUT'] = st.slider("Plane-Wave Cutoff Energy (ENCUT)", min_value=200.0, max_value=1000.0, value=incar_defaults['ENCUT'], step=10.0)
+incar_settings['ICHARG'] = col1.selectbox("Charge Initialization (ICHARG)", [1, 2, 10], index=[1, 2, 10].index(incar_defaults['ICHARG']))
 
-incar_settings['ALGO'] = st.selectbox("Electronic Optimization Algorithm (ALGO)", ['Normal', 'Fast', 'All'], index=['Normal', 'Fast', 'All'].index(incar_defaults['ALGO']))
+incar_settings['ENCUT'] = col1.slider("Plane-Wave Cutoff Energy (ENCUT)", min_value=200.0, max_value=1000.0, value=incar_defaults['ENCUT'], step=10.0)
 
-incar_settings['NELM'] = st.number_input("Max Number of Electronic Steps (NELM)", min_value=0, max_value=200, value=incar_defaults['NELM'])
+incar_settings['ALGO'] = col1.selectbox("Electronic Optimization Algorithm (ALGO)", ['Normal', 'Fast', 'All'], index=['Normal', 'Fast', 'All'].index(incar_defaults['ALGO']))
 
-incar_settings['EDIFF'] = st.number_input("Energy Convergence Criterion (EDIFF)", min_value=1e-8, max_value=1e-3, value=incar_defaults['EDIFF'], format="%.1e")
+incar_settings['NELM'] = col1.number_input("Max Number of Electronic Steps (NELM)", min_value=0, max_value=200, value=incar_defaults['NELM'])
 
-incar_settings['ISMEAR'] = st.selectbox("Smearing Type (ISMEAR)", [-5, -1, 0, 1, 2], index=[-5, -1, 0, 1, 2].index(incar_defaults['ISMEAR']))
+incar_settings['EDIFF'] = col1.number_input("Energy Convergence Criterion (EDIFF)", min_value=1e-8, max_value=1e-3, value=incar_defaults['EDIFF'], format="%.1e")
 
-incar_settings['SIGMA'] = st.slider("Smearing Width (SIGMA)", min_value=0.01, max_value=0.5, value=incar_defaults['SIGMA'], step=0.01)
+incar_settings['ISMEAR'] = col1.selectbox("Smearing Type (ISMEAR)", [-5, -1, 0, 1, 2], index=[-5, -1, 0, 1, 2].index(incar_defaults['ISMEAR']))
 
-incar_settings['EDIFFG'] = st.number_input("Ionic Relaxation Criterion (EDIFFG)", min_value=-1e-1, max_value=-1e-7, value=incar_defaults['EDIFFG'], format="%.1e")
+incar_settings['SIGMA'] = col1.slider("Smearing Width (SIGMA)", min_value=0.01, max_value=0.5, value=incar_defaults['SIGMA'], step=0.01)
 
-incar_settings['NSW'] = st.number_input("Number of Ionic Steps (NSW)", min_value=0, max_value=200, value=incar_defaults['NSW'])
+incar_settings['EDIFFG'] = col1.number_input("Ionic Relaxation Criterion (EDIFFG)", min_value=-1e-1, max_value=-1e-7, value=incar_defaults['EDIFFG'], format="%.1e")
 
-incar_settings['IBRION'] = st.selectbox("Ionic Relaxation Method (IBRION)", [0, 1, 2, 3], index=[0, 1, 2, 3].index(incar_defaults['IBRION']))
+incar_settings['NSW'] = col1.number_input("Number of Ionic Steps (NSW)", min_value=0, max_value=200, value=incar_defaults['NSW'])
 
-incar_settings['POTIM'] = st.slider("Step Size for Ionic Motion (POTIM)", min_value=0.01, max_value=2.0, value=incar_defaults['POTIM'], step=0.01)
+incar_settings['IBRION'] = col1.selectbox("Ionic Relaxation Method (IBRION)", [0, 1, 2, 3], index=[0, 1, 2, 3].index(incar_defaults['IBRION']))
 
-incar_settings['ISPIN'] = st.selectbox("Spin Polarization (ISPIN)", [1, 2], index=[1, 2].index(incar_defaults['ISPIN']))
+incar_settings['POTIM'] = col1.slider("Step Size for Ionic Motion (POTIM)", min_value=0.01, max_value=2.0, value=incar_defaults['POTIM'], step=0.01)
 
-incar_settings['MAGMOM'] = st.text_input("Initial Magnetic Moment (MAGMOM)", incar_defaults['MAGMOM'])
+incar_settings['ISPIN'] = col1.selectbox("Spin Polarization (ISPIN)", [1, 2], index=[1, 2].index(incar_defaults['ISPIN']))
 
-incar_settings['LORBIT'] = st.selectbox("Density of States (LORBIT)", [0, 10, 11], index=[0, 10, 11].index(incar_defaults['LORBIT']))
+incar_settings['MAGMOM'] = col1.text_input("Initial Magnetic Moment (MAGMOM)", incar_defaults['MAGMOM'])
 
-incar_settings['IVDW'] = st.selectbox("Van der Waals Correction (IVDW)", [0, 11, 12], index=[0, 11, 12].index(incar_defaults['IVDW']))
+incar_settings['LORBIT'] = col1.selectbox("Density of States (LORBIT)", [0, 10, 11], index=[0, 10, 11].index(incar_defaults['LORBIT']))
+
+incar_settings['IVDW'] = col1.selectbox("Van der Waals Correction (IVDW)", [0, 11, 12], index=[0, 11, 12].index(incar_defaults['IVDW']))
 
 # Display the dynamically generated INCAR file
-st.subheader("Generated INCAR File")
+col2.subheader("Generated INCAR File")
 incar_text = generate_incar(incar_settings)
-incar_display = st.text_area("INCAR", incar_text, height=300)
+incar_display = col2.text_area("INCAR", incar_text, height=800)
+col2.subheader("Download INCAR")
+download_file("INCAR", incar_text, col2)
 
+st.divider()
+
+col1_, col2_ = st.columns(2)
 # KPOINTS settings
-st.subheader("KPOINTS Settings")
-kmesh_type = st.selectbox("K-Mesh Type", ['Automatic', 'Gamma', 'Monkhorst-Pack'])
+col1_.subheader("KPOINTS Settings")
+kmesh_type = col1_.selectbox("K-Mesh Type", ['Gamma', 'Monkhorst-Pack'])
 
-kpoints = st.columns(3)
+kpoints = col1_.columns(3)
 kpoint_values = [
     kpoints[0].number_input("Kx", min_value=1, max_value=10, value=3),
     kpoints[1].number_input("Ky", min_value=1, max_value=10, value=3),
     kpoints[2].number_input("Kz", min_value=1, max_value=10, value=3)
 ]
 
-shift = st.columns(3)
+shift = col1_.columns(3)
 shift_values = [
     shift[0].number_input("Shift x", min_value=0.0, max_value=1.0, value=0.0, step=0.1),
     shift[1].number_input("Shift y", min_value=0.0, max_value=1.0, value=0.0, step=0.1),
@@ -187,14 +190,13 @@ shift_values = [
 ]
 
 # Display the dynamically generated KPOINTS file
-st.subheader("Generated KPOINTS File")
+col2_.subheader("Generated KPOINTS File")
 kpoints_text = generate_kpoints(kmesh_type, kpoint_values, shift_values)
-kpoints_display = st.text_area("KPOINTS", kpoints_text, height=200)
+kpoints_display = col2_.text_area("KPOINTS", kpoints_text, height=200)
 
 # Download buttons
-st.subheader("Download Files")
-download_file("INCAR", incar_text)
-download_file("KPOINTS", kpoints_text)
+col2_.subheader("Download KPOINTS File")
+download_file("KPOINTS", kpoints_text, col2_)
 
 # Suggestions for additional INCAR options
 st.subheader("Suggestions for Additional INCAR Options")
