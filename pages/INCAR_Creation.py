@@ -17,13 +17,12 @@ st.sidebar.write('* [PyMatgen](https://pymatgen.org/) for Periodic Structure Rep
 st.sidebar.write('* [PubChempy](https://pypi.org/project/PubChemPy/1.0/) for Accessing the PubChem Database')
 st.sidebar.write('* [MP-API](https://pypi.org/project/mp-api/) for Accessing the Materials Project Database')
 st.sidebar.write('* [ASE](https://wiki.fysik.dtu.dk/ase/) for File Format Conversions')
-st.sidebar.write('### *Source Code*')
-st.sidebar.write('[GitHub Repository](https://github.com/manassharma07/VASP-GUI)')
 st.sidebar.write('### *Useful links*')
 st.sidebar.write('[Web App Source Code](https://github.com/manassharma07/VASP-GUI)')
 st.sidebar.write('[VASP Wiki](https://www.vasp.at/wiki/index.php/The_VASP_Manual)')
 st.sidebar.write('[VASP Official Website](https://www.vasp.at/)')
 st.sidebar.write('[VASP Forum](https://www.vasp.at/forum/)')
+
 
 # Initialize default INCAR settings
 incar_defaults = {
