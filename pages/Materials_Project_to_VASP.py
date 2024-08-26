@@ -386,14 +386,14 @@ if docs is not None:
 
     # Get VASP POSCAR KPOINTS and INCAR file contents
     st.subheader("VASP Files for the Supercell")
-    poscar_content2, kpoints_content2, incar_content2 = generate_vasp_input_files(supercell_structure)
+    poscar_content2, kpoints_content2, incar_content2 = generate_vasp_input_files(supercell_structure, direct=direct)
 
     # Display POSCAR and KPOINTS in editable text boxes
     col1, col2 = st.columns(2)
 
     with col1:
         st.write("### POSCAR")
-        poscar_editable2 = st.text_area("POSCAR Content", poscar_content2, height=300)
+        poscar_editable2 = st.text_area("POSCAR Content for supercell", poscar_content2, height=300)
         st.download_button(
             label="Download POSCAR for supercell",
             data=poscar_editable2,
@@ -403,7 +403,7 @@ if docs is not None:
 
     with col2:
         st.write("### KPOINTS")
-        kpoints_editable2 = st.text_area("KPOINTS Content", kpoints_content2, height=300)
+        kpoints_editable2 = st.text_area("KPOINTS Content for supercell", kpoints_content2, height=300)
         st.download_button(
             label="Download KPOINTS for supercell",
             data=kpoints_editable2,
@@ -415,7 +415,7 @@ if docs is not None:
     st.subheader("Sample INCAR")
     incar_editable2 = st.text_area("INCAR Content for supercell", incar_content2, height=300)
     st.download_button(
-        label="Download INCAR",
+        label="Download INCAR for supercell",
         data=incar_editable2,
         file_name='INCAR',
         mime='text/plain',
