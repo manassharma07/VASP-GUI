@@ -184,7 +184,7 @@ if contents != '':
     display_structure_info(AseAtomsAdaptor.get_structure(structure))
     visualize_structure(AseAtomsAdaptor.get_structure(structure))
     
-    convert_to_cif(primitive_structure, "primitive_unit_cell.cif")
+    convert_to_cif(AseAtomsAdaptor.get_structure(structure), "cell.cif")
     st.download_button('Download Cell CIF', data=read_file("cell.cif"), file_name='cell.cif', key='cell_cif_button')
     
     # Display forces
