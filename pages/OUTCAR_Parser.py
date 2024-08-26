@@ -14,6 +14,28 @@ import base64
 import tempfile
 from pymatgen.io.ase import AseAtomsAdaptor
 
+# Set page config
+st.set_page_config(page_title='VASP OUTCAR Parser', layout='wide', page_icon="⚛️",
+menu_items={
+         'About': "A web app to help you parse VASP OUTCAR file."
+     })
+
+# Sidebar stuff
+st.sidebar.write('# About')
+st.sidebar.write(' The web app is made By [Manas Sharma](https://manas.bragitoff.com)')
+st.sidebar.write('### *Powered by*')
+st.sidebar.write('* [Py3Dmol](https://3dmol.csb.pitt.edu/) for Chemical System Visualizations')
+st.sidebar.write('* [Streamlit](https://streamlit.io/) for making of the Web App')
+st.sidebar.write('* [PyMatgen](https://pymatgen.org/) for Periodic Structure Representations')
+st.sidebar.write('* [PubChempy](https://pypi.org/project/PubChemPy/1.0/) for Accessing the PubChem Database')
+st.sidebar.write('* [MP-API](https://pypi.org/project/mp-api/) for Accessing the Materials Project Database')
+st.sidebar.write('* [ASE](https://wiki.fysik.dtu.dk/ase/) for File Format Conversions')
+st.sidebar.write('### *Useful links*')
+st.sidebar.write('[Web App Source Code](https://github.com/manassharma07/VASP-GUI)')
+st.sidebar.write('[VASP Wiki](https://www.vasp.at/wiki/index.php/The_VASP_Manual)')
+st.sidebar.write('[VASP Official Website](https://www.vasp.at/)')
+st.sidebar.write('[VASP Forum](https://www.vasp.at/forum/)')
+
 # Function to parse energies, structures, and forces from OUTCAR
 def parse_outcar(outcar_text):
     # Create a temporary file
@@ -117,7 +139,7 @@ def read_file(filename):
     with open(filename, 'r') as file:
         return file.read()
 
-st.title("VASP OUTCAR Parser")
+st.title("VASP `OUTCAR` Parser")
 st.write("This tool parses a VASP OUTCAR file and extracts relevant information.")
 
 st.write('You can either paste the OUTCAR file contents below or upload the source file')
