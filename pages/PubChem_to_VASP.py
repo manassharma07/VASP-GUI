@@ -209,3 +209,43 @@ if compounds is not None:
         file_name="molecule.xyz",
         mime="chemical/x-xyz"
     )
+
+    # Create a structure with vacuum
+    structure = selected_molecule.get_boxed_structure(15, 15, 15)  # 15 Å vacuum on each side
+
+    # Generate VASP input files
+    poscar_content, kpoints_content, incar_content = generate_vasp_input_files(structure)
+
+    st.subheader("VASP Input Files")
+    # Display POSCAR and KPOINTS in editable text boxes
+    col1, col2 = st.columns(2)
+
+    with col1:
+        st.write("### POSCAR")
+        poscar_editable = st.text_area("POSCAR Content", poscar_content, height=300)
+        st.download_button(
+            label="Download POSCAR",
+            data=poscar_editable,
+            file_name='POSCAR',
+            mime='text/plain',
+        )
+
+    with col2:
+        st.write("### KPOINTS")
+        kpoints_editable = st.text_area("KPOINTS Content", kpoints_content, height=300)
+        st.download_button(
+            label="Download KPOINTS",
+            data=kpoints_editable,
+            file_name='KPOINTS',
+            mime='text/plain',
+        )
+
+    # Display INCAR file
+    st.subheader("Sample INCAR")
+    incar_editable = st.text_area("INCAR Content", incar_content, height=300)
+    st.download_button(
+        label="Download INCAR",
+        data=incar_editable,
+        file_name='INCAR',
+        mime='text/plain',
+    )
