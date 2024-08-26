@@ -106,7 +106,7 @@ def generate_xyz_coordinates(cid):
 
     return xyz_text
 
-def create_structure_with_vacuum(molecule, vacuum=15):
+def create_structure_with_vacuum(molecule, vacuum):
     # Get the max and min coordinates in each dimension
     coords = molecule.cart_coords
     min_coords = np.min(coords, axis=0)
@@ -130,9 +130,7 @@ def create_structure_with_vacuum(molecule, vacuum=15):
     new_coords = coords + translation
     
     # Create a new structure
-    structure = molecule.copy()
-    structure.lattice = lattice
-    structure.cart_coords = new_coords
+    structure = Structure(lattice, molecule.species, new_coords, coords_are_cartesian=True)
     
     return structure
 
@@ -228,8 +226,7 @@ if compounds is not None:
 
     #     # Get the optimized structure as Pymatgen structure
     #     selected_molecule = AseAtomsAdaptor().get_molecule(ase_atoms)
-    # Visualization
-    visualize_structure(selected_molecule)
+    
 
 
 
@@ -245,6 +242,8 @@ if compounds is not None:
     vacuum_size = st.slider("Select vacuum size (Å)", min_value=10, max_value=35, value=15, step=1)
     # Create a structure with vacuum
     structure = create_structure_with_vacuum(selected_molecule, vacuum=vacuum_size)  # 15 Å vacuum on each side
+    # Visualization
+    visualize_structure(structure)
 
     # Generate VASP input files
     poscar_content, kpoints_content, incar_content = generate_vasp_input_files(structure)
