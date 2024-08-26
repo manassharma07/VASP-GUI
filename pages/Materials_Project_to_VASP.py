@@ -53,7 +53,7 @@ def convert_to_poscar_pymatgen(structure, filename):
 # Function to generate VASP input files (KPOINTS, INCAR)
 def generate_vasp_input_files(structure, direct=False):
     # Generate POSCAR
-    convert_to_poscar_ase(structure, 'POSCAR', direct=False)
+    convert_to_poscar_ase(structure, 'POSCAR', direct=direct)
     poscar_content = read_file('POSCAR')
     # Generate KPOINTS
     kpoints_content = """Automatic generation
