@@ -37,29 +37,45 @@ def parse_outcar(outcar_text):
 # Function to display structure information
 def display_structure_info(structure):
     st.subheader("Structure Information")
-    st.write("Chemical Formula: ", structure.get_chemical_formula())
+    st.write("Formula: ", structure.composition.reduced_formula)
 
-    # Display lattice parameters
-    lattice = structure.get_cell_lengths_and_angles()
+    #Display lattice parameters
+    a, b, c = structure.lattice.abc
+    alpha, beta, gamma = structure.lattice.angles
 
+    # Create a DataFrame for the lattice parameters and angles
     data = {
-        "Lattice Parameters": lattice[:3],
-        "Angles (degrees)": lattice[3:]
+        "Lattice Parameters": [a, b, c, alpha, beta, gamma]
     }
     df_latt_params = pd.DataFrame(data, index=["a", "b", "c", "alpha", "beta", "gamma"])
     with st.expander("Lattice Parameters", expanded=False):
         st.table(df_latt_params)
 
-    # Display atomic positions
-    with st.expander("Atomic Positions", expanded=False):
-        positions = structure.get_positions()
-        symbols = structure.get_chemical_symbols()
+    # Display lattice vectors
+    lattice_vectors = structure.lattice.matrix
+    df_vectors = pd.DataFrame(lattice_vectors, columns=["X", "Y", "Z"], index=["a", "b", "c"])
+    with st.expander("Lattice Vectors", expanded=True):
+        # st.write("Lattice Vectors:")
+        st.table(df_vectors)
 
-        atomic_coords = []
-        for symbol, position in zip(symbols, positions):
-            atomic_coords.append([symbol] + list(position))
-
+    # Create a list of atomic coordinates
+    with st.expander("Atomic Coordinates", expanded=False):
+        coord_type = st.selectbox('Coordinate type', ['Cartesian', 'Fractional/Crystal'])
+        if coord_type=='Cartesian':
+            atomic_coords = []
+            for site in structure.sites:
+                atomic_coords.append([site.species_string] + list(site.coords))
+        else:
+            atomic_coords = []
+            for site in structure.sites:
+                atomic_coords.append([site.species_string] + list(site.frac_coords))
+        
+        # Create a Pandas DataFrame from the atomic coordinates list
         df_coords = pd.DataFrame(atomic_coords, columns=["Element", "X", "Y", "Z"])
+
+    
+        # Display the atomic coordinates as a table
+        # st.write("Atomic Coordinates:")
         st.table(df_coords)
 
 # Function to visualize the structure using ASE and py3Dmol
