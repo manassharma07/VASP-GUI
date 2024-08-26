@@ -100,6 +100,7 @@ if file is not None:
 
     # To read file as string:
     contents = stringio.read()
+    st.write(contents)
 
 if contents != '':
     # contents = file.getvalue().decode("utf-8")
