@@ -83,10 +83,25 @@ def cif_download_link(structure):
 st.title("VASP OUTCAR Parser")
 st.write("This tool parses a VASP OUTCAR file and extracts relevant information.")
 
-# File upload
-file = st.file_uploader("Upload your OUTCAR file", type=["outcar"])
+st.write('You can either paste the OUTCAR file contents below or upload the source file')
+contents = st.text_area(label='Enter the contents of the OUTCAR file here', value='', placeholder='Put your text here',
+                        height=400, key='input_text_area')
+# Create a file uploader widget
+file = st.file_uploader("or Upload the file")
 
 if file is not None:
+    # If a file is uploaded, read its contents
+    # contents = file.read()
+    # To read file as bytes:
+    bytes_data = file.getvalue()
+
+    # To convert to a string based IO:
+    stringio = StringIO(file.getvalue().decode("utf-8"))
+
+    # To read file as string:
+    contents = stringio.read()
+
+if contents != '':
     contents = file.getvalue().decode("utf-8")
     
     # Parse structures, energies, and forces
