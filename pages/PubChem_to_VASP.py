@@ -12,6 +12,7 @@ import requests
 from pymatgen.core.periodic_table import Element
 from pymatgen.io.vasp.inputs import Poscar
 from ase.io.vasp import write_vasp
+import numpy as np
 
 
 # Set page config
@@ -63,8 +64,8 @@ def generate_vasp_input_files(structure, direct=False):
     # Generate KPOINTS
     kpoints_content = """Automatic generation
 0
-Monkhorst-pack
- 4 4 4
+Gamma
+ 1 1 1
  0 0 0
     """
 
@@ -105,20 +106,49 @@ def generate_xyz_coordinates(cid):
 
     return xyz_text
 
+def create_structure_with_vacuum(molecule, vacuum=15):
+    # Get the max and min coordinates in each dimension
+    coords = molecule.cart_coords
+    min_coords = np.min(coords, axis=0)
+    max_coords = np.max(coords, axis=0)
+    
+    # Calculate the molecule's dimensions
+    dimensions = max_coords - min_coords
+    
+    # Calculate the new box dimensions with vacuum
+    new_dimensions = dimensions + 2 * vacuum
+    
+    # Create a new lattice
+    lattice = np.diag(new_dimensions)
+    
+    # Center the molecule in the new box
+    center = (max_coords + min_coords) / 2
+    new_center = new_dimensions / 2
+    translation = new_center - center
+    
+    # Translate the molecule
+    new_coords = coords + translation
+    
+    # Create a new structure
+    structure = molecule.copy()
+    structure.lattice = lattice
+    structure.cart_coords = new_coords
+    
+    return structure
 
 # Function to visualize the structure using py3Dmol
 def visualize_structure(structure, html_file_name='viz.html'):
     spin = st.checkbox('Spin', value = False, key='key'+html_file_name)
     view = py3Dmol.view(width=500, height=400)
-    xyz_for_visualization = structure.to(fmt="xyz")
-    view.addModel(xyz_for_visualization, 'xyz')
+    cif_for_visualization = structure.to(fmt="cif")
+    view.addModel(cif_for_visualization, 'cif')
     # view.setStyle({'stick': {'radius': 0.2}})
     view.setStyle({'sphere':{'colorscheme':'Jmol','scale':0.3},
                     'stick':{'colorscheme':'Jmol', 'radius':0.2}})
-    # view.addUnitCell()
+    view.addUnitCell()
     view.zoomTo()
     view.spin(spin)
-    view.setClickable({'clickable':'true'})
+    view.setClickable({'clickable':'true'});
     view.enableContextMenu({'contextMenuEnabled':'true'})
     view.show()
     view.render()
@@ -210,8 +240,11 @@ if compounds is not None:
         mime="chemical/x-xyz"
     )
 
+    # # Create a structure with vacuum
+    # structure = selected_molecule.get_boxed_structure(15, 15, 15)  # 15 Å vacuum on each side
+    vacuum_size = st.slider("Select vacuum size (Å)", min_value=10, max_value=35, value=15, step=1)
     # Create a structure with vacuum
-    structure = selected_molecule.get_boxed_structure(15, 15, 15)  # 15 Å vacuum on each side
+    structure = create_structure_with_vacuum(selected_molecule, vacuum=vacuum_size)  # 15 Å vacuum on each side
 
     # Generate VASP input files
     poscar_content, kpoints_content, incar_content = generate_vasp_input_files(structure)
