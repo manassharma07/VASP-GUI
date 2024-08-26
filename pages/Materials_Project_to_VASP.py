@@ -8,6 +8,7 @@ import streamlit.components.v1 as components
 from ase.io import read
 from pymatgen.io.ase import AseAtomsAdaptor
 from io import StringIO
+from pymatgen.io.vasp.inputs import Poscar
 
 # Set page config
 st.set_page_config(page_title='Materials Project ➡️ VASP', layout='wide', page_icon="⚛️",
@@ -204,8 +205,8 @@ mpr = MPRester(api_key)
 
 # Streamlit app
 docs = None
-st.write('# Materials Project ➡️ RIPER')
-st.write("#### Get atomic coordinates and cell parameters for RIPER (TURBOMOLE) from Materials Project Database")
+st.write('# Materials Project ➡️ VASP')
+st.write("#### Get POSCAR, KPOINTS, and INCAR files from Materials Project Database")
 
 # Search by material_id, formula or elements?
 # input_type = st.selectbox("Search by:", ['Formula','Material ID','Elements'])
