@@ -1,0 +1,140 @@
+import streamlit as st
+import numpy as np
+import pandas as pd
+import matplotlib.pyplot as plt
+import plotly.express as px
+from io import StringIO
+from ase.io import read, write
+from ase.visualize import view
+from ase import Atoms
+import py3Dmol
+import streamlit.components.v1 as components
+import base64
+
+# Function to parse energies, structures, and forces from OUTCAR
+def parse_outcar(outcar_text):
+    structures = read(StringIO(outcar_text), format='vasp-out', index=':')
+    energies = []
+    forces = []
+
+    lines = outcar_text.split('\n')
+    for line in lines:
+        if "free  energy   TOTEN" in line:
+            energies.append(float(line.split()[-2]))
+
+    for structure in structures:
+        forces.append(structure.get_forces())
+    
+    return structures, energies, forces
+
+# Function to display structure information
+def display_structure_info(structure):
+    st.subheader("Structure Information")
+    st.write("Chemical Formula: ", structure.get_chemical_formula())
+
+    # Display lattice parameters
+    lattice = structure.get_cell_lengths_and_angles()
+
+    data = {
+        "Lattice Parameters": lattice[:3],
+        "Angles (degrees)": lattice[3:]
+    }
+    df_latt_params = pd.DataFrame(data, index=["a", "b", "c", "alpha", "beta", "gamma"])
+    with st.expander("Lattice Parameters", expanded=False):
+        st.table(df_latt_params)
+
+    # Display atomic positions
+    with st.expander("Atomic Positions", expanded=False):
+        positions = structure.get_positions()
+        symbols = structure.get_chemical_symbols()
+
+        atomic_coords = []
+        for symbol, position in zip(symbols, positions):
+            atomic_coords.append([symbol] + list(position))
+
+        df_coords = pd.DataFrame(atomic_coords, columns=["Element", "X", "Y", "Z"])
+        st.table(df_coords)
+
+# Function to visualize the structure using ASE and py3Dmol
+def visualize_structure(structure):
+    xyz_str = structure.write("xyz", format="xyz")
+    xyz_str = xyz_str.replace("\n", "\\n").replace("\r", "")
+
+    view = py3Dmol.view(width=500, height=400)
+    view.addModel(xyz_str, "xyz")
+    view.setStyle({'sphere': {'colorscheme': 'Jmol', 'scale': 0.3},
+                   'stick': {'colorscheme': 'Jmol', 'radius': 0.2}})
+    view.addUnitCell()
+    view.zoomTo()
+    view.spin(False)
+    view.show()
+
+    t = view.js()
+    components.html(t, height=400, width=500)
+
+# Function to allow CIF download
+def cif_download_link(structure):
+    cif_str = StringIO()
+    write(cif_str, structure, format='cif')
+    b64 = base64.b64encode(cif_str.getvalue().encode()).decode()
+    href = f'<a href="data:text/cif;base64,{b64}" download="structure.cif">Download CIF</a>'
+    return href
+
+st.title("VASP OUTCAR Parser")
+st.write("This tool parses a VASP OUTCAR file and extracts relevant information.")
+
+# File upload
+file = st.file_uploader("Upload your OUTCAR file", type=["outcar"])
+
+if file is not None:
+    contents = file.getvalue().decode("utf-8")
+    
+    # Parse structures, energies, and forces
+    structures, energies, forces = parse_outcar(contents)
+    
+    # Display the number of structures found
+    num_structures = len(structures)
+    st.subheader(f"Number of Structures Found: {num_structures}")
+    
+    if num_structures > 1:
+        selected_structure_index = st.selectbox("Select structure to display:", range(num_structures))
+    else:
+        selected_structure_index = 0
+    
+    structure = structures[selected_structure_index]
+    
+    # Display parsed data
+    st.subheader("Parsed Energies")
+    energy_data = {
+        "SCF Iteration": list(range(1, len(energies) + 1)),
+        "Total Energy": energies,
+    }
+    df_energy = pd.DataFrame(energy_data)
+    
+    st.dataframe(df_energy)
+
+    tab1, tab2 = st.tabs(["Plotly", "Matplotlib"])
+    with tab1:
+        fig = px.scatter(df_energy, x="SCF Iteration", y="Total Energy", title="Total Energy vs SCF Iteration")
+        fig.update_traces(mode='lines+markers', marker={'size': 8})
+        st.plotly_chart(fig)
+    with tab2:
+        plt.figure(figsize=(10, 6))
+        plt.plot(df_energy["SCF Iteration"], df_energy["Total Energy"], marker='o', linestyle='-', color='b', label='Total Energy')
+        plt.xlabel("SCF Iteration")
+        plt.ylabel("Energy (eV)")
+        plt.title("Total Energy vs SCF Iteration")
+        plt.legend()
+        st.pyplot(plt)
+    
+    # Display structure information and visualization
+    display_structure_info(structure)
+    visualize_structure(structure)
+    
+    # CIF download link
+    st.markdown(cif_download_link(structure), unsafe_allow_html=True)
+    
+    # Display forces
+    st.subheader("Atomic Forces")
+    forces_df = pd.DataFrame(forces[selected_structure_index], columns=["Fx", "Fy", "Fz"])
+    st.dataframe(forces_df)
