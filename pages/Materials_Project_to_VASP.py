@@ -9,6 +9,7 @@ from ase.io import read
 from pymatgen.io.ase import AseAtomsAdaptor
 from io import StringIO
 from pymatgen.io.vasp.inputs import Poscar
+from ase.io.vasp import write_vasp
 
 # Set page config
 st.set_page_config(page_title='Materials Project ➡️ VASP', layout='wide', page_icon="⚛️",
@@ -36,6 +37,12 @@ st.sidebar.write('[VASP Forum](https://www.vasp.at/forum/)')
 api_key = st.secrets["MP_API"]
 
 # Function to convert a structure to POSCAR format and save to file
+def convert_to_poscar_ase(structure, filename, direct=False):
+    ase_atoms = structure.to_ase_atoms()
+    with open(filename, 'w') as f:
+        write_vasp(f, ase_atoms, direct=direct)
+
+# Function to convert a structure to POSCAR format and save to file
 def convert_to_poscar_pymatgen(structure, filename):
     poscar = Poscar(structure)
     poscar.write_file(filename)
@@ -44,9 +51,9 @@ def convert_to_poscar_pymatgen(structure, filename):
     return poscar_content
 
 # Function to generate VASP input files (KPOINTS, INCAR)
-def generate_vasp_input_files(structure):
+def generate_vasp_input_files(structure, direct=False):
     # Generate POSCAR
-    poscar_content = convert_to_poscar_pymatgen(structure, 'POSCAR')
+    poscar_content = convert_to_poscar_ase(structure, 'POSCAR', direct=False)
 
     # Generate KPOINTS
     kpoints_content = """Automatic generation
@@ -307,10 +314,16 @@ if docs is not None:
 
     # Get VASP POSCAR KPOINTS and INCAR file contents
     st.subheader("VASP Files")
-    if selected_structure_type=='Primitive Cell':
-        poscar_content, kpoints_content, incar_content = generate_vasp_input_files(primitive_structure)
+    # Add a selection box for coordinate type
+    coord_type = st.selectbox("Select coordinate type for POSCAR", ["Direct", "Cartesian"])
+    if coord_type=='Direct':
+        direct = True
     else:
-        poscar_content, kpoints_content, incar_content = generate_vasp_input_files(conventional_structure)
+        direct = False
+    if selected_structure_type=='Primitive Cell':
+        poscar_content, kpoints_content, incar_content = generate_vasp_input_files(primitive_structure, direct=direct)
+    else:
+        poscar_content, kpoints_content, incar_content = generate_vasp_input_files(conventional_structure, direct=direct)
 
     # Display POSCAR and KPOINTS in editable text boxes
     col1, col2 = st.columns(2)
@@ -380,30 +393,30 @@ if docs is not None:
 
     with col1:
         st.write("### POSCAR")
-        poscar_editable = st.text_area("POSCAR Content", poscar_content, height=300)
+        poscar_editable2 = st.text_area("POSCAR Content", poscar_content, height=300)
         st.download_button(
             label="Download POSCAR",
-            data=poscar_editable,
+            data=poscar_editable2,
             file_name='POSCAR',
             mime='text/plain',
         )
 
     with col2:
         st.write("### KPOINTS")
-        kpoints_editable = st.text_area("KPOINTS Content", kpoints_content, height=300)
+        kpoints_editable2 = st.text_area("KPOINTS Content", kpoints_content, height=300)
         st.download_button(
             label="Download KPOINTS",
-            data=kpoints_editable,
+            data=kpoints_editable2,
             file_name='KPOINTS',
             mime='text/plain',
         )
 
     # Display INCAR file
     st.subheader("Sample INCAR")
-    incar_editable = st.text_area("INCAR Content", incar_content, height=300)
+    incar_editable2 = st.text_area("INCAR Content", incar_content, height=300)
     st.download_button(
         label="Download INCAR",
-        data=incar_editable,
+        data=incar_editable2,
         file_name='INCAR',
         mime='text/plain',
     )
