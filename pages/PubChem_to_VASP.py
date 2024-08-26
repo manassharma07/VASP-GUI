@@ -13,6 +13,7 @@ from pymatgen.core.periodic_table import Element
 from pymatgen.io.vasp.inputs import Poscar
 from ase.io.vasp import write_vasp
 import numpy as np
+from pymatgen.core import Structure
 
 
 # Set page config
