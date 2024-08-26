@@ -10,10 +10,17 @@ from ase import Atoms
 import py3Dmol
 import streamlit.components.v1 as components
 import base64
+import tempfile
+from pymatgen.io.ase import AseAtomsAdaptor
 
 # Function to parse energies, structures, and forces from OUTCAR
 def parse_outcar(outcar_text):
-    structures = read(StringIO(outcar_text), format='vasp-out', index=':')
+    # Create a temporary file
+    with open('temp_outcar', 'w') as temp_outcar:
+        # Write the OUTCAR content to the temporary file
+        temp_outcar.write(outcar_text)
+        temp_outcar.flush()  # Ensure content is written
+    structures = read('temp_outcar', format='vasp-out', index=':')
     energies = []
     forces = []
 
@@ -100,7 +107,7 @@ if file is not None:
 
     # To read file as string:
     contents = stringio.read()
-    st.write(contents)
+    # st.write(contensts)
 
 if contents != '':
     # contents = file.getvalue().decode("utf-8")
@@ -144,7 +151,7 @@ if contents != '':
         st.pyplot(plt)
     
     # Display structure information and visualization
-    display_structure_info(structure)
+    display_structure_info(AseAtomsAdaptor.get_structure(structure))
     visualize_structure(structure)
     
     # CIF download link
