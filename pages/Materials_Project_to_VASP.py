@@ -55,7 +55,6 @@ def generate_vasp_input_files(structure, direct=False):
     # Generate POSCAR
     convert_to_poscar_ase(structure, 'POSCAR', direct=False)
     poscar_content = read_file('POSCAR')
-    st.write(poscar_content)
     # Generate KPOINTS
     kpoints_content = """Automatic generation
 0
@@ -387,16 +386,16 @@ if docs is not None:
 
     # Get VASP POSCAR KPOINTS and INCAR file contents
     st.subheader("VASP Files for the Supercell")
-    poscar_content, kpoints_content, incar_content = generate_vasp_input_files(supercell_structure)
+    poscar_content2, kpoints_content2, incar_content2 = generate_vasp_input_files(supercell_structure)
 
     # Display POSCAR and KPOINTS in editable text boxes
     col1, col2 = st.columns(2)
 
     with col1:
         st.write("### POSCAR")
-        poscar_editable2 = st.text_area("POSCAR Content", poscar_content, height=300)
+        poscar_editable2 = st.text_area("POSCAR Content", poscar_content2, height=300)
         st.download_button(
-            label="Download POSCAR",
+            label="Download POSCAR for supercell",
             data=poscar_editable2,
             file_name='POSCAR',
             mime='text/plain',
@@ -404,9 +403,9 @@ if docs is not None:
 
     with col2:
         st.write("### KPOINTS")
-        kpoints_editable2 = st.text_area("KPOINTS Content", kpoints_content, height=300)
+        kpoints_editable2 = st.text_area("KPOINTS Content", kpoints_content2, height=300)
         st.download_button(
-            label="Download KPOINTS",
+            label="Download KPOINTS for supercell",
             data=kpoints_editable2,
             file_name='KPOINTS',
             mime='text/plain',
@@ -414,7 +413,7 @@ if docs is not None:
 
     # Display INCAR file
     st.subheader("Sample INCAR")
-    incar_editable2 = st.text_area("INCAR Content", incar_content, height=300)
+    incar_editable2 = st.text_area("INCAR Content for supercell", incar_content2, height=300)
     st.download_button(
         label="Download INCAR",
         data=incar_editable2,
