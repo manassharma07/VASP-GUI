@@ -4,6 +4,7 @@ import pandas as pd
 import matplotlib.pyplot as plt
 import plotly.express as px
 from io import StringIO
+from pymatgen.io.cif import CifWriter
 from ase.io import read, write
 from ase.visualize import view
 from ase import Atoms
@@ -78,30 +79,43 @@ def display_structure_info(structure):
         # st.write("Atomic Coordinates:")
         st.table(df_coords)
 
-# Function to visualize the structure using ASE and py3Dmol
-def visualize_structure(structure):
-    xyz_str = structure.write("xyz", format="xyz")
-    xyz_str = xyz_str.replace("\n", "\\n").replace("\r", "")
-
+# Function to visualize the structure using py3Dmol
+def visualize_structure(structure, html_file_name='viz.html'):
+    spin = st.checkbox('Spin', value = False, key='key'+html_file_name)
     view = py3Dmol.view(width=500, height=400)
-    view.addModel(xyz_str, "xyz")
-    view.setStyle({'sphere': {'colorscheme': 'Jmol', 'scale': 0.3},
-                   'stick': {'colorscheme': 'Jmol', 'radius': 0.2}})
+    cif_for_visualization = structure.to(fmt="cif")
+    view.addModel(cif_for_visualization, 'cif')
+    # view.setStyle({'stick': {'radius': 0.2}})
+    view.setStyle({'sphere':{'colorscheme':'Jmol','scale':0.3},
+                    'stick':{'colorscheme':'Jmol', 'radius':0.2}})
     view.addUnitCell()
     view.zoomTo()
-    view.spin(False)
+    view.spin(spin)
+    view.setClickable({'clickable':'true'});
+    view.enableContextMenu({'contextMenuEnabled':'true'})
     view.show()
-
+    view.render()
+    # view.png()
     t = view.js()
-    components.html(t, height=400, width=500)
+    f = open(html_file_name, 'w')
+    f.write(t.startjs)
+    f.write(t.endjs)
+    f.close()
 
-# Function to allow CIF download
-def cif_download_link(structure):
-    cif_str = StringIO()
-    write(cif_str, structure, format='cif')
-    b64 = base64.b64encode(cif_str.getvalue().encode()).decode()
-    href = f'<a href="data:text/cif;base64,{b64}" download="structure.cif">Download CIF</a>'
-    return href
+    HtmlFile = open(html_file_name, 'r', encoding='utf-8')
+    source_code = HtmlFile.read() 
+    components.html(source_code, height = 300, width=500)
+    HtmlFile.close()
+
+# Function to convert a structure to CIF
+def convert_to_cif(structure, filename):
+    cif_writer = CifWriter(structure)
+    cif_writer.write_file(filename)
+
+# return filecontents
+def read_file(filename):
+    with open(filename, 'r') as file:
+        return file.read()
 
 st.title("VASP OUTCAR Parser")
 st.write("This tool parses a VASP OUTCAR file and extracts relevant information.")
@@ -168,10 +182,10 @@ if contents != '':
     
     # Display structure information and visualization
     display_structure_info(AseAtomsAdaptor.get_structure(structure))
-    visualize_structure(structure)
+    visualize_structure(AseAtomsAdaptor.get_structure(structure))
     
-    # CIF download link
-    st.markdown(cif_download_link(structure), unsafe_allow_html=True)
+    convert_to_cif(primitive_structure, "primitive_unit_cell.cif")
+    st.download_button('Download Cell CIF', data=read_file("cell.cif"), file_name='cell.cif', key='cell_cif_button')
     
     # Display forces
     st.subheader("Atomic Forces")
