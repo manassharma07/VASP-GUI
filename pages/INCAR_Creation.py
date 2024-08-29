@@ -10,6 +10,7 @@ st.set_page_config(page_title='INCAR Creator', layout='wide', page_icon="⚛️"
 # Sidebar stuff
 st.sidebar.write('# About')
 st.sidebar.write(' The web app is made By [Manas Sharma](https://manas.bragitoff.com)')
+st.sidebar.write(' in the groups of [Prof. Ananth Govind Rajan](https://www.agrgroup.org) and [Prof. Sudeep Punnathanam](https://chemeng.iisc.ac.in/sudeep/).')
 st.sidebar.write('### *Powered by*')
 st.sidebar.write('* [Py3Dmol](https://3dmol.csb.pitt.edu/) for Chemical System Visualizations')
 st.sidebar.write('* [Streamlit](https://streamlit.io/) for making of the Web App')
