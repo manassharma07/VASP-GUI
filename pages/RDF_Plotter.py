@@ -7,6 +7,8 @@ from ase.io import read
 from scipy.spatial.distance import pdist
 from io import StringIO
 import io
+# import plotly.graph_objects as go
+from scipy.interpolate import CubicSpline
 
 # Set page config
 st.set_page_config(page_title='RDF Plot from Trajectory', layout='wide', page_icon="⚛️",
@@ -48,11 +50,13 @@ def calculate_rdf(trajectory, r_range, dr, elements=None):
     
     rdf = rdf / n_frames
     
-    # Normalize RDF
+    
     volume = atoms.get_volume()
+    # Normalize RDF (old)
     n_atoms = len(positions)
     norm = 4 * np.pi * r_range[1:]**2 * dr * n_atoms * (n_atoms - 1) / (2 * volume)
-    rdf = rdf / norm
+    rdf = rdf / norm 
+
     
     return rdf
 
@@ -78,7 +82,11 @@ st.title("Radial Distribution Function Plotter")
 #     # if trajectory_content:
 #     #     trajectory = read(StringIO(trajectory_content), format="xyz", index=":")
 
-uploaded_file = st.file_uploader("Upload trajectory file (XYZ format)", type="xyz")
+input_file_type = st.radio("Choose input file type:", ("extXYZ", "XDATCAR"))
+if input_file_type == 'extXYZ':
+    uploaded_file = st.file_uploader("Upload trajectory file (XYZ format)", type="xyz")
+elif input_file_type == 'XDATCAR':
+    uploaded_file = st.file_uploader("Upload trajectory file (XDATCAR format)")
 if uploaded_file is not None:
     # trajectory = read(uploaded_file, index=":")
     # Read the file contents
@@ -88,26 +96,74 @@ if uploaded_file is not None:
     string_io = io.StringIO(file_contents)
 
     # Read the trajectory
-    trajectory = read(string_io, index=":", format="extxyz")
+    if input_file_type == 'extXYZ':
+        trajectory = read(string_io, index=":", format="extxyz")
+    elif input_file_type == 'XDATCAR':
+        trajectory = read(string_io, index=":", format="vasp-xdatcar")
+        
 # Parameters
 r_max = st.slider("Maximum distance (r_max)", min_value=1.0, max_value=10.0, value=5.0, step=0.1)
 dr = st.slider("Distance resolution (dr)", min_value=0.01, max_value=0.5, value=0.1, step=0.01)
+
+st.warning('The current implementation does not take into account the PBC!')
 
 # Plot settings
 plot_title = st.text_input("Plot title", "Radial Distribution Function")
 x_axis_title = st.text_input("X-axis title", "r (Å)")
 y_axis_title = st.text_input("Y-axis title", "g(r)")
 
+# # Plot type selection
+# plot_type = st.radio("Choose plot type:", ("Matplotlib", "Plotly"))
+
+# if 'trajectory' in locals():
+#     r_range = np.arange(0, r_max + dr, dr)
+#     rdf = calculate_rdf(trajectory, r_range, dr)
+
+#     if plot_type == "Matplotlib":
+#         fig, ax = plt.subplots(figsize=(10, 6))
+#         ax.plot(r_range[1:], rdf)
+#         ax.set_xlabel(x_axis_title)
+#         ax.set_ylabel(y_axis_title)
+#         ax.set_title(plot_title)
+#         ax.grid(True)
+#         st.pyplot(fig)
+#     else:
+#         fig = go.Figure()
+#         fig.add_trace(go.Scatter(x=r_range[1:], y=rdf, mode='lines'))
+#         fig.update_layout(
+#             title=plot_title,
+#             xaxis_title=x_axis_title,
+#             yaxis_title=y_axis_title,
+#         )
+#         st.plotly_chart(fig)
 # Plot type selection
 plot_type = st.radio("Choose plot type:", ("Matplotlib", "Plotly"))
+
+# Interpolation option
+use_spline = st.checkbox("Use cubic spline interpolation")
+
+# Plot style selection
+plot_style = st.radio("Plot style:", ("Line", "Scatter + Line"))
 
 if 'trajectory' in locals():
     r_range = np.arange(0, r_max + dr, dr)
     rdf = calculate_rdf(trajectory, r_range, dr)
 
+    if use_spline:
+        spline = CubicSpline(r_range[1:], rdf)
+        r_smooth = np.linspace(r_range[1], r_range[-1], 500)
+        rdf_smooth = spline(r_smooth)
+    else:
+        r_smooth = r_range[1:]
+        rdf_smooth = rdf
+
     if plot_type == "Matplotlib":
         fig, ax = plt.subplots(figsize=(10, 6))
-        ax.plot(r_range[1:], rdf)
+        if plot_style == "Line":
+            ax.plot(r_smooth, rdf_smooth, label='RDF')
+        else:  # Scatter + Line
+            ax.plot(r_smooth, rdf_smooth, label='RDF', linestyle='-', marker='o')
+
         ax.set_xlabel(x_axis_title)
         ax.set_ylabel(y_axis_title)
         ax.set_title(plot_title)
@@ -115,7 +171,11 @@ if 'trajectory' in locals():
         st.pyplot(fig)
     else:
         fig = go.Figure()
-        fig.add_trace(go.Scatter(x=r_range[1:], y=rdf, mode='lines'))
+        if plot_style == "Line":
+            fig.add_trace(go.Scatter(x=r_smooth, y=rdf_smooth, mode='lines', name='RDF'))
+        else:  # Scatter + Line
+            fig.add_trace(go.Scatter(x=r_smooth, y=rdf_smooth, mode='lines+markers', name='RDF'))
+
         fig.update_layout(
             title=plot_title,
             xaxis_title=x_axis_title,

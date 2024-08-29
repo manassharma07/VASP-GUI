@@ -8,7 +8,7 @@ from io import StringIO
 # Set page config
 st.set_page_config(page_title='NVT MD OSZICAR Analyzer', layout='wide', page_icon="⚛️",
 menu_items={
-         'About': "A web app to help you analyze your MD runs uing VASP."
+         'About': "A web app to help you analyze your MD runs using VASP."
      })
 
 # Sidebar stuff
@@ -29,7 +29,7 @@ st.sidebar.write('[VASP Official Website](https://www.vasp.at/)')
 st.sidebar.write('[VASP Forum](https://www.vasp.at/forum/)')
 
 # Function to parse the OSZICAR file and extract relevant data
-def parse_oszicar(file_content):
+def parse_oszicar(file_content, dt):
     temperatures = []
     energies = []
     free_energies = []
@@ -41,23 +41,27 @@ def parse_oszicar(file_content):
     # Regular expression pattern to match the lines containing T, E, F, E0, EK, SP, SK
     pattern = re.compile(r"T=\s*([\d\.\-]+)\s*E=\s*([\d\.\-E\+]+)\s*F=\s*([\d\.\-E\+]+)\s*E0=\s*([\d\.\-E\+]+)\s*EK=\s*([\d\.\-E\+]+)\s*SP=\s*([\d\.\-E\+]+)\s*SK=\s*([\d\.\-E\+]+)")
 
-    for line in file_content:
-        match = pattern.search(line)
-        if match:
-            temperatures.append(float(match.group(1)))
-            energies.append(float(match.group(2)))
-            free_energies.append(float(match.group(3)))
-            e0s.append(float(match.group(4)))
-            eks.append(float(match.group(5)))
-            sps.append(float(match.group(6)))
-            sks.append(float(match.group(7)))
+    for i, line in enumerate(file_content):
+        if i % dt == 0:  # Only collect data at every 'dt' steps
+            match = pattern.search(line)
+            if match:
+                temperatures.append(float(match.group(1)))
+                energies.append(float(match.group(2)))
+                free_energies.append(float(match.group(3)))
+                e0s.append(float(match.group(4)))
+                eks.append(float(match.group(5)))
+                sps.append(float(match.group(6)))
+                sks.append(float(match.group(7)))
 
     return temperatures, energies, free_energies, e0s, eks, sps, sks
 
 # Streamlit app
 st.title("NVT MD OSZICAR File Analyser")
 
-# uploaded_file = st.file_uploader("Upload OSZICAR file")
+# User input for timestep interval
+dt = st.number_input('Enter the timestep interval (dt)', min_value=1, value=1, step=1)
+
+# User can either paste the OSZICAR file contents or upload the file
 st.write('You can either paste the OSZICAR file contents below or upload the source file')
 file_contents = st.text_area(label='Enter the contents of the OSZICAR file here', value='', placeholder='Put your text here',
                         height=400, key='input_text_area')
@@ -66,23 +70,16 @@ file = st.file_uploader("or Upload the OSZICAR file")
 
 if file is not None:
     # If a file is uploaded, read its contents
-    # contents = file.read()
-    # To read file as bytes:
     bytes_data = file.getvalue()
-
-    # To convert to a string based IO:
     stringio = StringIO(file.getvalue().decode("utf-8"))
-
-    # To read file as string:
     file_contents = stringio.read()
-    # st.write(contensts)
 
 if file_contents != '':
     # Decode the uploaded file content
     file_content = file_contents.splitlines()
 
-    # Parse the file to extract data
-    temperatures, energies, free_energies, e0s, eks, sps, sks = parse_oszicar(file_content)
+    # Parse the file to extract data at intervals of dt
+    temperatures, energies, free_energies, e0s, eks, sps, sks = parse_oszicar(file_content, dt)
 
     # Convert the extracted data to a DataFrame
     data = {
@@ -145,7 +142,7 @@ if file_contents != '':
         axs[6].set_title("SK")
 
         for ax in axs:
-            ax.set_xlabel("Step")
+            ax.set_xlabel(f"Step (every {dt})")
             ax.set_ylabel("Value")
             ax.grid(True)
 
@@ -155,8 +152,8 @@ if file_contents != '':
     elif plot_type == 'plotly':
         fig = px.line(df, y=["Temperature (T)", "Total Energy (E)", "Free Energy (F)", 
                              "E0", "Kinetic Energy (EK)", "SP", "SK"], 
-                      title="OSZICAR Data Over Time",
-                      labels={"value": "Value", "index": "Step"})
+                      title=f"OSZICAR Data Over Time (every {dt} steps)",
+                      labels={"value": "Value", "index": f"Step (every {dt})"})
         fig.update_layout(height=800)
         st.plotly_chart(fig)
 
