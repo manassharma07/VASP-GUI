@@ -59,25 +59,36 @@ def calculate_rdf(trajectory, r_range, dr, elements=None):
 st.title("Radial Distribution Function Plotter")
 
 # Input method selection
-input_method = st.radio("Choose input method:", ("Upload file", "Paste content"))
+# input_method = st.radio("Choose input method:", ("Upload file", "Paste content"))
 
-if input_method == "Upload file":
-    uploaded_file = st.file_uploader("Upload trajectory file (XYZ format)", type="xyz")
-    if uploaded_file is not None:
-        # trajectory = read(uploaded_file, index=":")
-        # Read the file contents
-        file_contents = uploaded_file.read().decode("utf-8")
+# if input_method == "Upload file":
+#     uploaded_file = st.file_uploader("Upload trajectory file (XYZ format)", type="xyz")
+#     if uploaded_file is not None:
+#         # trajectory = read(uploaded_file, index=":")
+#         # Read the file contents
+#         file_contents = uploaded_file.read().decode("utf-8")
     
-        # Create a StringIO object
-        string_io = io.StringIO(file_contents)
+#         # Create a StringIO object
+#         string_io = io.StringIO(file_contents)
     
-        # Read the trajectory
-        trajectory = read(string_io, index=":", format="extxyz")
-else:
-    trajectory_content = st.text_area("Paste trajectory content (XYZ format)")
-    # if trajectory_content:
-    #     trajectory = read(StringIO(trajectory_content), format="xyz", index=":")
+#         # Read the trajectory
+#         trajectory = read(string_io, index=":", format="extxyz")
+# else:
+#     trajectory_content = st.text_area("Paste trajectory content (XYZ format)")
+#     # if trajectory_content:
+#     #     trajectory = read(StringIO(trajectory_content), format="xyz", index=":")
 
+uploaded_file = st.file_uploader("Upload trajectory file (XYZ format)", type="xyz")
+if uploaded_file is not None:
+    # trajectory = read(uploaded_file, index=":")
+    # Read the file contents
+    file_contents = uploaded_file.read().decode("utf-8")
+
+    # Create a StringIO object
+    string_io = io.StringIO(file_contents)
+
+    # Read the trajectory
+    trajectory = read(string_io, index=":", format="extxyz")
 # Parameters
 r_max = st.slider("Maximum distance (r_max)", min_value=1.0, max_value=10.0, value=5.0, step=0.1)
 dr = st.slider("Distance resolution (dr)", min_value=0.01, max_value=0.5, value=0.1, step=0.01)
