@@ -15,7 +15,7 @@ The web app is available at [https://vasp-gui.streamlit.app/](https://vasp-gui.s
 **Hint**: Use the sidebar menu on the left to navigate between different options.
 
 ## About the developer
-I am a computational material scientist who likes to work in the area of method development. Currently, I am a postoctoral researcher in the Chemical Engineering Department of the [Indian Institute of Science, Bengaluru, India](https://iic.ac.in). I have obtained my PhD in Physics from [Friedrich Schiller University Jena (FSU) Germany](https://www.uni-jena.de/), under the supervision of [Prof. Dr. Marek Sierka](https://www.cmsg.uni-jena.de/).
+I am a computational material scientist who likes to work in the area of method development. Currently, I am a postoctoral researcher in the Chemical Engineering Department of the [Indian Institute of Science, Bengaluru, India](https://iisc.ac.in). I have obtained my PhD in Physics from [Friedrich Schiller University Jena (FSU) Germany](https://www.uni-jena.de/), under the supervision of [Prof. Dr. Marek Sierka](https://www.cmsg.uni-jena.de/).
 My passion lies in developing codes and methods to model the light-matter interaction of hybrid systems. 
 
 You can find out more about me here: [https://manas.bragitoff.com/](https://manas.bragitoff.com/)
