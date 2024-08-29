@@ -162,7 +162,7 @@ if file is not None:
     contents = stringio.read()
     # st.write(contensts)
 
-if contents != '':
+# if contents != '':
     # contents = file.getvalue().decode("utf-8")
     
     # Parse structures, energies, and forces
