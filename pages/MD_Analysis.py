@@ -3,6 +3,7 @@ import matplotlib.pyplot as plt
 import plotly.express as px
 import re
 import pandas as pd
+from io import StringIO
 
 # Set page config
 st.set_page_config(page_title='NVT MD OSZICAR Analyzer', layout='wide', page_icon="⚛️",
@@ -56,11 +57,29 @@ def parse_oszicar(file_content):
 # Streamlit app
 st.title("NVT MD OSZICAR File Analyser")
 
-uploaded_file = st.file_uploader("Upload OSZICAR file")
+# uploaded_file = st.file_uploader("Upload OSZICAR file")
+st.write('You can either paste the OSZICAR file contents below or upload the source file')
+file_contents = st.text_area(label='Enter the contents of the OSZICAR file here', value='', placeholder='Put your text here',
+                        height=400, key='input_text_area')
+# Create a file uploader widget
+file = st.file_uploader("or Upload the OSZICAR file")
 
-if uploaded_file is not None:
+if file is not None:
+    # If a file is uploaded, read its contents
+    # contents = file.read()
+    # To read file as bytes:
+    bytes_data = file.getvalue()
+
+    # To convert to a string based IO:
+    stringio = StringIO(file.getvalue().decode("utf-8"))
+
+    # To read file as string:
+    file_contents = stringio.read()
+    # st.write(contensts)
+
+if file_contents != '':
     # Decode the uploaded file content
-    file_content = uploaded_file.read().decode("utf-8").splitlines()
+    file_content = file_contents.splitlines()
 
     # Parse the file to extract data
     temperatures, energies, free_energies, e0s, eks, sps, sks = parse_oszicar(file_content)
