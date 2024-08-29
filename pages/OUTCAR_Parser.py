@@ -143,11 +143,11 @@ def read_file(filename):
 st.title("VASP `OUTCAR` Parser")
 st.write("This tool parses a VASP OUTCAR file and extracts relevant information.")
 
-st.write('You can either paste the OUTCAR file contents below or upload the source file')
-contents = st.text_area(label='Enter the contents of the OUTCAR file here', value='', placeholder='Put your text here',
-                        height=400, key='input_text_area')
+# st.write('You can either paste the OUTCAR file contents below or upload the source file')
+# contents = st.text_area(label='Enter the contents of the OUTCAR file here', value='', placeholder='Put your text here',
+#                         height=400, key='input_text_area')
 # Create a file uploader widget
-file = st.file_uploader("or Upload the file")
+file = st.file_uploader("Upload the OUTCAR file")
 
 if file is not None:
     # If a file is uploaded, read its contents
