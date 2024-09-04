@@ -279,10 +279,20 @@ if file_format == 'CIF':
     cif_parser_selection = st.radio('Choose CIF parser', cif_parser_options)
 
 uploaded_file = st.file_uploader("Choose a file", type=["cif", "xyz", "car", "POSCAR", "pwi", "extxyz"])
+pasted_content = st.text_area('or paste the contents of the file here:', height=400)
+
+contents = None
 
 if uploaded_file is not None:
-    # To read file as string:
     contents = uploaded_file.read().decode('utf-8')
+elif pasted_content:
+    contents = pasted_content
+
+if contents:
+
+# if uploaded_file is not None:
+#     # To read file as string:
+#     contents = uploaded_file.read().decode('utf-8')
 
     if file_format == 'CIF' and cif_parser_selection == 'Pymatgen':
         structure = parse_cif_pymatgen(contents)
