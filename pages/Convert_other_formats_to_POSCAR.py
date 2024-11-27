@@ -67,7 +67,7 @@ def convert_to_poscar_pymatgen(structure, filename):
 def convert_to_poscar_ase(structure, filename, direct=False):
     ase_atoms = structure.to_ase_atoms()
     with open(filename, 'w') as f:
-        write_vasp(f, ase_atoms, direct=direct)
+        write_vasp(f, ase_atoms, direct=direct, sort=True)
     
     
 
