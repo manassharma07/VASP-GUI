@@ -8,7 +8,7 @@ ipython
 pubchempy
 ase
 openpyxl
-emmet-core>=0.64.6
+emmet-core==0.64.6
 plotly
 openbabel-wheel
 xlsxwriter
